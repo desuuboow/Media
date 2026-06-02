@@ -1,0 +1,1464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ROSEA Humanitarian Monitor — AI Enhanced</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#f7f7f5;--surface:#fff;--surface2:#f0efe9;--border:#e2e0d8;--border2:#cccac0;
+  --text:#1a1a18;--text2:#5a5a54;--text3:#9a9a90;
+  --blue:#185FA5;--blue-bg:#E6F1FB;--blue-text:#0C447C;
+  --red:#E24B4A;--red-bg:#FCEBEB;--red-text:#791F1F;
+  --amber-bg:#FAEEDA;--amber-text:#633806;
+  --green-bg:#EAF3DE;--green-text:#27500A;
+  --purple-bg:#EEEDFE;--purple-text:#3C3489;
+  --teal-bg:#E1F5EE;--teal-text:#085041;
+  --pink-bg:#FBEAF0;--pink-text:#72243E;
+}
+body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+
+/* ── AUTH ── */
+#authOverlay{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:999;}
+.auth-card{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:42px 38px;width:360px;box-shadow:0 8px 40px rgba(0,0,0,.09);}
+.auth-logo-wrap{display:flex;justify-content:center;margin-bottom:20px;}
+.auth-logo{width:48px;height:48px;background:var(--blue);border-radius:12px;display:flex;align-items:center;justify-content:center;}
+.auth-logo svg{width:24px;height:24px;color:#fff;}
+.auth-title{font-size:19px;font-weight:600;text-align:center;margin-bottom:4px;}
+.auth-sub{font-size:12px;color:var(--text3);text-align:center;margin-bottom:28px;line-height:1.5;}
+.auth-field{margin-bottom:14px;}
+.auth-field label{font-size:11px;font-weight:500;color:var(--text2);display:block;margin-bottom:5px;}
+.auth-field input{width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:8px;font-size:14px;font-family:inherit;color:var(--text);}
+.auth-field input:focus{outline:none;border-color:var(--blue);}
+.auth-btn{width:100%;padding:11px;background:var(--blue);color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:500;cursor:pointer;font-family:inherit;margin-top:6px;}
+.auth-btn:hover{background:#0C447C;}
+.auth-err{font-size:12px;color:var(--red);text-align:center;margin-top:10px;min-height:16px;}
+.auth-note{font-size:11px;color:var(--text3);text-align:center;margin-top:18px;line-height:1.55;}
+
+/* ── TOPBAR ── */
+.topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:10px 24px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10;}
+.topbar-left{display:flex;align-items:center;gap:10px;}
+.tlogo{width:28px;height:28px;background:var(--blue);border-radius:7px;display:flex;align-items:center;justify-content:center;}
+.tlogo svg{width:15px;height:15px;color:#fff;}
+.topbar h1{font-size:14px;font-weight:600;}
+.topbar-sub{font-size:12px;color:var(--text3);}
+.topbar-right{display:flex;align-items:center;gap:10px;}
+.user-pill{font-size:11px;background:var(--blue-bg);color:var(--blue-text);padding:3px 10px;border-radius:99px;border:1px solid #85B7EB;}
+.logout-btn{font-size:11px;padding:4px 10px;border:1px solid var(--border);border-radius:6px;background:transparent;cursor:pointer;color:var(--text2);font-family:inherit;}
+.logout-btn:hover{background:var(--surface2);}
+.badges{display:flex;gap:5px;flex-wrap:wrap;}
+.badge-pill{font-size:10px;padding:2px 8px;border-radius:99px;border:1px solid;}
+
+/* ── LAYOUT ── */
+.layout{display:flex;min-height:calc(100vh - 53px);}
+.sidebar{width:282px;min-width:282px;background:var(--surface);border-right:1px solid var(--border);padding:16px;overflow-y:auto;}
+.main{flex:1;padding:22px 26px;overflow-y:auto;}
+
+/* ── SIDEBAR ELEMENTS ── */
+.slabel{font-size:10px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--text3);margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;}
+.cnt{background:var(--surface2);font-size:11px;padding:1px 7px;border-radius:99px;font-weight:400;text-transform:none;letter-spacing:0;color:var(--text2);}
+.qa{display:flex;gap:7px;}
+.ql{font-size:11px;color:var(--blue);cursor:pointer;text-transform:none;letter-spacing:0;}
+.ql:hover{text-decoration:underline;}
+.region-group{margin-bottom:7px;}
+.region-hdr{display:flex;align-items:center;justify-content:space-between;cursor:pointer;padding:3px 0;margin-bottom:3px;user-select:none;}
+.region-name{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.04em;color:var(--text2);}
+.region-arrow{font-size:9px;color:var(--text3);}
+.region-tags{display:flex;flex-wrap:wrap;gap:4px;}
+.region-tags.collapsed{display:none;}
+.tag{font-size:11px;padding:3px 8px;border-radius:99px;border:1px solid var(--border);cursor:pointer;color:var(--text2);background:var(--surface);user-select:none;transition:all .1s;}
+.tag:hover{border-color:var(--border2);}
+.tag.on{background:var(--blue-bg);color:var(--blue-text);border-color:#85B7EB;}
+.tags{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:12px;}
+.ttag{font-size:11px;padding:3px 8px;border-radius:99px;border:1px solid var(--border);cursor:pointer;color:var(--text2);background:var(--surface);user-select:none;transition:all .1s;}
+.ttag.conflict.on{background:var(--red-bg);color:var(--red-text);border-color:#F09595;}
+.ttag.food.on{background:var(--amber-bg);color:var(--amber-text);border-color:#EF9F27;}
+.ttag.health.on{background:var(--green-bg);color:var(--green-text);border-color:#97C459;}
+.ttag.displacement.on{background:var(--purple-bg);color:var(--purple-text);border-color:#AFA9EC;}
+.ttag.climate.on{background:var(--teal-bg);color:var(--teal-text);border-color:#5DCAA5;}
+.ttag.political.on{background:var(--pink-bg);color:var(--pink-text);border-color:#ED93B1;}
+hr{border:none;border-top:1px solid var(--border);margin:12px 0;}
+.field{margin-bottom:10px;}
+.field label{font-size:11px;font-weight:500;color:var(--text2);display:block;margin-bottom:4px;}
+select{width:100%;padding:7px 9px;border:1px solid var(--border);border-radius:7px;font-size:12px;background:var(--surface);color:var(--text);font-family:inherit;cursor:pointer;}
+select:focus{outline:none;border-color:var(--blue);}
+.scan-btn{width:100%;margin-top:10px;padding:10px;background:var(--blue);color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:500;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px;font-family:inherit;}
+.scan-btn:hover{background:#0C447C;}
+.scan-btn:disabled{opacity:.4;cursor:not-allowed;}
+.clr-btn{width:100%;margin-top:5px;padding:7px;background:transparent;color:var(--text2);border:1px solid var(--border);border-radius:8px;font-size:12px;cursor:pointer;font-family:inherit;}
+.clr-btn:hover{background:var(--surface2);}
+.pbar{height:3px;background:var(--border);border-radius:2px;overflow:hidden;margin-top:10px;}
+.pfill{height:100%;background:var(--blue);border-radius:2px;width:0%;transition:width .3s ease;}
+.hint{font-size:11px;color:var(--text3);margin-top:4px;line-height:1.5;}
+.kw-tags{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px;}
+.kw-tag{font-size:11px;padding:2px 7px;border-radius:99px;background:var(--purple-bg);color:var(--purple-text);border:1px solid #AFA9EC;display:flex;align-items:center;gap:3px;}
+.kw-tag button{background:none;border:none;cursor:pointer;color:var(--purple-text);font-size:13px;line-height:1;padding:0;}
+.site-tag{font-size:11px;padding:2px 7px;border-radius:99px;background:var(--teal-bg);color:var(--teal-text);border:1px solid #5DCAA5;display:flex;align-items:center;gap:3px;}
+.site-tag button{background:none;border:none;cursor:pointer;color:var(--teal-text);font-size:13px;line-height:1;padding:0;}
+.auto-tag{opacity:.6;}
+.add-row{display:flex;gap:5px;margin-top:6px;}
+.add-row input{flex:1;padding:5px 8px;border:1px solid var(--border);border-radius:7px;font-size:12px;font-family:inherit;color:var(--text);background:var(--surface);}
+.add-row input:focus{outline:none;border-color:var(--blue);}
+.add-btn{padding:5px 9px;background:var(--blue);color:#fff;border:none;border-radius:7px;font-size:12px;cursor:pointer;font-family:inherit;}
+.add-btn:hover{background:#0C447C;}
+.sweep-btn{width:100%;padding:7px;background:var(--purple-bg);color:var(--purple-text);border:1px solid #AFA9EC;border-radius:7px;font-size:12px;font-weight:500;cursor:pointer;font-family:inherit;margin-top:6px;}
+.sweep-btn:hover{background:#dddcfc;}
+.toggle-row{display:flex;align-items:flex-start;gap:7px;margin-top:6px;}
+.toggle-row label{font-size:12px;color:var(--text2);cursor:pointer;user-select:none;line-height:1.4;}
+input[type=checkbox]{accent-color:var(--blue);width:14px;height:14px;cursor:pointer;flex-shrink:0;margin-top:1px;}
+.src-section{margin-top:14px;}
+.src-title{font-size:10px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--text3);margin-bottom:7px;}
+.src-list{display:flex;flex-direction:column;gap:5px;}
+.src-item{display:flex;align-items:center;gap:7px;font-size:11px;color:var(--text2);}
+.src-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
+
+/* ── MAIN ── */
+.main-hdr{margin-bottom:18px;}
+.main-hdr h2{font-size:20px;font-weight:600;}
+.main-hdr p{font-size:13px;color:var(--text2);margin-top:4px;line-height:1.5;}
+.info-box{background:var(--blue-bg);border:1px solid #85B7EB;border-radius:8px;padding:12px 15px;font-size:13px;color:var(--blue-text);margin-bottom:16px;line-height:1.7;}
+.stats{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;}
+.scard{flex:1;min-width:80px;background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:10px 13px;}
+.scard .v{font-size:21px;font-weight:600;}
+.scard .k{font-size:11px;color:var(--text3);margin-top:1px;}
+.src-pills{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px;}
+.src-pill-btn{font-size:11px;padding:4px 11px;border-radius:6px;border:1px solid var(--border);cursor:pointer;color:var(--text2);background:var(--surface);}
+.src-pill-btn:hover{background:var(--surface2);}
+.src-pill-btn.active{background:var(--blue-bg);color:var(--blue-text);border-color:#85B7EB;}
+.cfilter-row{display:flex;align-items:center;gap:8px;margin-bottom:12px;flex-wrap:wrap;}
+.cfl{font-size:11px;color:var(--text3);white-space:nowrap;}
+.csel{padding:4px 8px;border:1px solid var(--border);border-radius:6px;font-size:12px;background:var(--surface);color:var(--text);font-family:inherit;cursor:pointer;}
+.csel:focus{outline:none;border-color:var(--blue);}
+.acard{background:var(--surface);border:1px solid var(--border);border-radius:11px;padding:14px 17px;margin-bottom:8px;}
+.acard:hover{border-color:var(--border2);}
+.acard.critical{border-left:3px solid var(--red);}
+.acard.high{border-left:3px solid #EF9F27;}
+.acard.medium{border-left:3px solid #378ADD;}
+.acard.monitor{border-left:3px solid var(--border2);}
+.atop{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:6px;}
+.atitle{font-size:14px;font-weight:500;line-height:1.4;}
+.atitle a{color:var(--text);text-decoration:none;}
+.atitle a:hover{color:var(--blue);text-decoration:underline;}
+.badge{font-size:10px;padding:3px 8px;border-radius:99px;white-space:nowrap;font-weight:600;flex-shrink:0;}
+.badge.critical{background:var(--red-bg);color:var(--red-text);}
+.badge.high{background:var(--amber-bg);color:var(--amber-text);}
+.badge.medium{background:var(--blue-bg);color:var(--blue-text);}
+.badge.monitor{background:var(--surface2);color:var(--text2);}
+.asum{font-size:13px;color:var(--text2);line-height:1.65;}
+.ameta{display:flex;flex-wrap:wrap;gap:9px;margin-top:8px;align-items:center;}
+.mt{font-size:11px;color:var(--text3);display:flex;align-items:center;gap:3px;}
+.mt svg{width:11px;height:11px;flex-shrink:0;}
+.apill{font-size:10px;padding:1px 7px;border-radius:99px;background:var(--surface2);color:var(--text3);border:1px solid var(--border);}
+.read-more{font-size:11px;color:var(--blue);text-decoration:none;margin-left:auto;display:flex;align-items:center;gap:2px;}
+.read-more:hover{text-decoration:underline;}
+.rhdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px;}
+.rtitle{font-size:13px;font-weight:500;color:var(--text2);}
+.export-row{display:flex;gap:5px;}
+.abtn{font-size:12px;padding:5px 10px;background:var(--surface);border:1px solid var(--border);border-radius:6px;cursor:pointer;color:var(--text2);font-family:inherit;}
+.abtn:hover{background:var(--surface2);}
+.errbanner{background:var(--red-bg);border:1px solid #F09595;border-radius:8px;padding:10px 14px;font-size:13px;color:var(--red-text);margin-bottom:12px;display:none;}
+.status-txt{font-size:12px;color:var(--text2);margin-bottom:10px;padding:8px 13px;background:var(--surface2);border-radius:7px;display:none;}
+/* ── AI PANEL ── */
+.ai-key-wrap{position:relative;}
+.ai-key-wrap input{width:100%;padding:7px 30px 7px 9px;border:1px solid var(--border);border-radius:7px;font-size:12px;font-family:inherit;color:var(--text);background:var(--surface);}
+.ai-key-wrap input:focus{outline:none;border-color:var(--blue);}
+.ai-eye{position:absolute;right:7px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--text3);font-size:13px;padding:0;}
+.ai-analyze-btn{width:100%;margin-top:8px;padding:9px;background:linear-gradient(135deg,#6C47FF,#0EA5E9);color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;font-family:inherit;}
+.ai-analyze-btn:hover{opacity:.9;}
+.ai-analyze-btn:disabled{opacity:.45;cursor:not-allowed;}
+.ai-panel{background:var(--blue-bg);border:1px solid #85B7EB;border-radius:10px;padding:16px 20px;margin-bottom:16px;display:none;}
+.ai-panel-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+.ai-panel-title{font-size:13px;font-weight:600;color:var(--blue-text);display:flex;align-items:center;gap:6px;}
+.ai-close{background:none;border:none;cursor:pointer;color:var(--text3);font-size:18px;line-height:1;padding:0;}
+.ai-body{font-size:13px;color:var(--blue-text);line-height:1.65;}
+.ai-body h3{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--blue);margin:12px 0 4px;}
+.ai-body p{margin:0 0 8px;}
+.ai-body ul{margin:0 0 8px;padding-left:18px;}
+.ai-body li{margin-bottom:3px;}
+.ai-badge{font-size:9px;padding:2px 6px;background:#6C47FF;color:#fff;border-radius:99px;font-weight:600;margin-left:4px;vertical-align:middle;}
+.ai-export-btn{font-size:11px;padding:4px 10px;background:#fff;border:1px solid #85B7EB;border-radius:6px;cursor:pointer;color:var(--blue-text);font-family:inherit;margin-top:8px;}
+.ai-export-btn:hover{background:var(--blue-bg);}
+/* ── SECTION / THEME DIVIDERS ── */
+.sec-hdr{display:flex;align-items:center;justify-content:space-between;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:8px 14px;margin:14px 0 8px;}
+.sec-hdr-title{font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--text2);}
+.sec-hdr.hum{background:#FEF3F2;border-color:#FECDCA;}
+.sec-hdr.hum .sec-hdr-title{color:#C0392B;}
+.sec-hdr.other{background:var(--surface2);border-color:var(--border2);}
+.theme-div{display:flex;align-items:center;gap:8px;margin:10px 0 4px;}
+.theme-div-label{font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--text3);white-space:nowrap;}
+.theme-div-line{flex:1;height:1px;background:var(--border);}
+.theme-div-cnt{font-size:10px;color:var(--text3);white-space:nowrap;}
+.empty{text-align:center;padding:60px 20px;color:var(--text3);}
+.empty svg{width:42px;height:42px;margin:0 auto 12px;opacity:.22;display:block;}
+.empty p{font-size:14px;}
+@media(max-width:700px){
+  .layout{flex-direction:column;}
+  .sidebar{width:100%;min-width:unset;border-right:none;border-bottom:1px solid var(--border);}
+  .main{padding:14px;}
+  .topbar{padding:8px 14px;}
+  .topbar-sub,.badges{display:none;}
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════ AUTH OVERLAY ═══════════════════ -->
+<div id="authOverlay">
+  <div class="auth-card">
+    <div class="auth-logo-wrap">
+      <div class="auth-logo">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="2"/><path d="M16.24 7.76a6 6 0 0 1 0 8.49M7.76 16.24a6 6 0 0 1 0-8.49M20.07 4.93a10 10 0 0 1 0 14.14M3.93 19.07a10 10 0 0 1 0-14.14"/></svg>
+      </div>
+    </div>
+    <div class="auth-title">ROSEA Humanitarian Monitor</div>
+    <div class="auth-sub">OCHA Regional Office — Southern &amp; Eastern Africa<br>Sign in to continue</div>
+    <div class="auth-field">
+      <label for="loginId">User ID</label>
+      <input type="text" id="loginId" placeholder="e.g. admin" autocomplete="username"
+        onkeydown="if(event.key==='Enter')document.getElementById('loginPw').focus()"/>
+    </div>
+    <div class="auth-field">
+      <label for="loginPw">Password</label>
+      <input type="password" id="loginPw" placeholder="Password" autocomplete="current-password"
+        onkeydown="if(event.key==='Enter')login()"/>
+    </div>
+    <button class="auth-btn" onclick="login()">Sign in</button>
+    <div class="auth-err" id="authErr">Incorrect user ID or password.</div>
+    <div class="auth-note">Authorised OCHA ROSEA staff only.<br>Contact the IM Unit to request access.</div>
+  </div>
+</div>
+
+<!-- ═══════════════════ MAIN APP ═══════════════════ -->
+<div id="app" style="display:none">
+<div class="topbar">
+  <div class="topbar-left">
+    <div class="tlogo">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="2"/><path d="M16.24 7.76a6 6 0 0 1 0 8.49M7.76 16.24a6 6 0 0 1 0-8.49M20.07 4.93a10 10 0 0 1 0 14.14M3.93 19.07a10 10 0 0 1 0-14.14"/></svg>
+    </div>
+    <h1>ROSEA Humanitarian Monitor</h1>
+    <span class="topbar-sub">25 countries &middot; Southern &amp; Eastern Africa</span>
+    <span style="font-size:10px;padding:2px 8px;background:linear-gradient(135deg,#6C47FF,#0EA5E9);color:#fff;border-radius:99px;font-weight:600;letter-spacing:.04em;">✨ AI Enhanced</span>
+  </div>
+  <div class="topbar-right">
+    <div class="badges">
+      <span class="badge-pill" style="background:var(--green-bg);color:var(--green-text);border-color:#97C459">ReliefWeb</span>
+      <span class="badge-pill" style="background:var(--amber-bg);color:var(--amber-text);border-color:#EF9F27">GDACS</span>
+      <span class="badge-pill" style="background:var(--blue-bg);color:var(--blue-text);border-color:#85B7EB">UN News</span>
+      <span class="badge-pill" style="background:var(--red-bg);color:var(--red-text);border-color:#F09595">WHO</span>
+      <span class="badge-pill" style="background:var(--teal-bg);color:var(--teal-text);border-color:#5DCAA5">FEWS NET</span>
+      <span class="badge-pill" style="background:var(--surface2);color:var(--text2);border-color:var(--border2)">Google News</span>
+    </div>
+    <span class="user-pill" id="userPill"></span>
+    <button class="logout-btn" onclick="logout()">Sign out</button>
+  </div>
+</div>
+
+<div class="layout">
+  <div class="sidebar">
+    <div class="slabel">
+      Countries <span class="cnt" id="cc">25</span>
+      <span class="qa">
+        <span class="ql" onclick="selAll()">all</span>
+        <span class="ql" onclick="clrAll()">none</span>
+      </span>
+    </div>
+    <div id="ctags"></div>
+
+    <hr>
+    <div class="slabel">Themes</div>
+    <div class="tags" id="ttags"></div>
+
+    <hr>
+    <div class="field">
+      <label>Time window</label>
+      <select id="tf">
+        <option value="1">Last 24 hours</option>
+        <option value="3" selected>Last 3 days</option>
+        <option value="7">Last 7 days</option>
+        <option value="14">Last 2 weeks</option>
+        <option value="30">Last 30 days</option>
+      </select>
+    </div>
+    <div class="field">
+      <label>Data source</label>
+      <select id="srcSel">
+        <option value="all" selected>All sources</option>
+        <option value="reliefweb">ReliefWeb only</option>
+        <option value="gdacs">GDACS only</option>
+        <option value="googlenews">Google News only</option>
+        <option value="feeds">RSS feeds only (UN/WHO/FEWS)</option>
+      </select>
+    </div>
+    <div class="field">
+      <label>Scan speed</label>
+      <select id="scanMode">
+        <option value="quick">&#x26A1; Quick (~20 s)</option>
+        <option value="standard" selected>&#x23F1; Standard (~1 min)</option>
+        <option value="full">&#x1F50D; Full (~3 min, max coverage)</option>
+      </select>
+    </div>
+
+    <hr>
+    <div class="slabel" style="margin-bottom:6px">Sweep keywords</div>
+    <p class="hint">Optional — loads official OCHA ROSEA keywords as <em>extra search signals</em>. The scan always runs broadly first; keywords add a focused layer on top for better relevance ranking.</p>
+    <button class="sweep-btn" onclick="loadSweepKw()">&#x2B07; Load keywords for selected countries</button>
+    <div class="add-row">
+      <input type="text" id="kwInput" placeholder="Add custom keyword…" onkeydown="if(event.key==='Enter')addKw()"/>
+      <button class="add-btn" onclick="addKw()">Add</button>
+    </div>
+    <div class="kw-tags" id="kwTags"></div>
+
+    <hr>
+    <div class="slabel" style="margin-bottom:6px">Media sources</div>
+    <div class="toggle-row">
+      <input type="checkbox" id="useCountryMedia" onchange="renderSiteTags()"/>
+      <label for="useCountryMedia">Auto-include country-specific outlets from the ROSEA sweep list</label>
+    </div>
+    <div class="add-row">
+      <input type="text" id="siteInput" placeholder="Add custom site…" onkeydown="if(event.key==='Enter')addSite()"/>
+      <button class="add-btn" onclick="addSite()">Add</button>
+    </div>
+    <div class="kw-tags" id="siteTags"></div>
+
+    <hr>
+    <div class="slabel" style="margin-bottom:6px">AI Analysis <span style="font-size:9px;padding:1px 5px;background:linear-gradient(135deg,#6C47FF,#0EA5E9);color:#fff;border-radius:99px;font-weight:600;">NEW</span></div>
+    <p class="hint">Enter your OpenAI API key to get AI-generated situation reports and smarter article analysis. Optional — the scan works without it.</p>
+    <div class="field">
+      <label>OpenAI API Key</label>
+      <div class="ai-key-wrap">
+        <input type="password" id="aiKey" placeholder="sk-…" autocomplete="off"
+          oninput="document.getElementById('aiAnalyzeBtn').disabled=!this.value.trim()"/>
+        <button class="ai-eye" onclick="var f=document.getElementById('aiKey');f.type=f.type==='password'?'text':'password'">👁</button>
+      </div>
+    </div>
+    <div class="toggle-row">
+      <input type="checkbox" id="autoAnalyze"/>
+      <label for="autoAnalyze">Auto-analyze after each scan</label>
+    </div>
+    <button class="ai-analyze-btn" id="aiAnalyzeBtn" onclick="runAIAnalysis()" disabled>
+      ✨ Analyze with GPT-4o mini
+    </button>
+    <hr>
+    <button class="scan-btn" id="scanBtn" onclick="runScan()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="2"/><path d="M16.24 7.76a6 6 0 0 1 0 8.49M7.76 16.24a6 6 0 0 1 0-8.49M20.07 4.93a10 10 0 0 1 0 14.14M3.93 19.07a10 10 0 0 1 0-14.14"/></svg>
+      Run scan
+    </button>
+    <button class="clr-btn" onclick="clrRes()">Clear results</button>
+    <div class="pbar"><div class="pfill" id="pfill"></div></div>
+
+    <div class="src-section">
+      <div class="src-title">Sources searched</div>
+      <div class="src-list">
+        <div class="src-item"><div class="src-dot" style="background:#2E7D32"></div>ReliefWeb API (OCHA)</div>
+        <div class="src-item"><div class="src-dot" style="background:#E65100"></div>GDACS disaster alerts</div>
+        <div class="src-item"><div class="src-dot" style="background:#1565C0"></div>UN News — Africa feed</div>
+        <div class="src-item"><div class="src-dot" style="background:#C62828"></div>WHO disease outbreaks</div>
+        <div class="src-item"><div class="src-dot" style="background:#4A148C"></div>FEWS NET food security</div>
+        <div class="src-item"><div class="src-dot" style="background:#BF360C"></div>AllAfrica RSS</div>
+        <div class="src-item"><div class="src-dot" style="background:#880E4F"></div>Google News (incl. country media)</div>
+        <div class="src-item"><div class="src-dot" style="background:#006064"></div>The New Humanitarian</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main">
+    <div class="main-hdr">
+      <h2>Humanitarian Intelligence Feed</h2>
+      <p>Maximum coverage across all ROSEA countries — ReliefWeb, GDACS, UN News, WHO, FEWS NET, AllAfrica, The New Humanitarian, and Google News including country-specific outlets from the sweep list.</p>
+    </div>
+    <div class="info-box" id="infoBox">
+      <strong>7 data sources + optional AI analysis (OpenAI GPT-4o mini).</strong><br>
+      &bull; <strong>AI Analysis</strong> — enter your OpenAI key in the sidebar to generate a professional SITREP narrative, reclassify articles by theme, and score severity using GPT-4o mini (~$0.002 per scan).<br>
+      &bull; <strong>Load sweep keywords</strong> — <em>optional</em>. Adds OCHA ROSEA keyword list as an extra search layer — scan always runs broadly without them.<br>
+      &bull; <strong>Scan speed</strong> — Quick (~20 s) for daily check; Full (~3 min) for maximum coverage.<br>
+      &bull; <strong>Export</strong> — AI .doc SITREP, standard .doc report with links, .txt, or .csv for Excel.
+    </div>
+    <div class="errbanner" id="errBanner"></div>
+    <div class="status-txt" id="statusTxt"></div>
+    <div class="stats" id="statsRow" style="display:none"></div>
+    <div class="src-pills" id="srcTabs" style="display:none"></div>
+    <div class="cfilter-row" id="countryFilterRow" style="display:none">
+      <span class="cfl">Country:</span>
+      <select class="csel" id="countrySel" onchange="applyCountryFilter()"><option value="all">All</option></select>
+    </div>
+    <!-- AI BRIEFING PANEL — shown after AI analysis -->
+    <div class="ai-panel" id="aiPanel">
+      <div class="ai-panel-hdr">
+        <span class="ai-panel-title">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a10 10 0 0 1 10 10c0 5.52-4.48 10-10 10S2 17.52 2 12 6.48 2 12 2"/><path d="M12 8v4l3 3"/></svg>
+          AI Situation Analysis
+          <span class="ai-badge">GPT-4o mini</span>
+        </span>
+        <div style="display:flex;gap:6px;align-items:center;">
+          <button class="ai-export-btn" onclick="exportAIWord()">📄 Export .doc</button>
+          <button class="ai-close" onclick="document.getElementById('aiPanel').style.display='none'">×</button>
+        </div>
+      </div>
+      <div class="ai-body" id="aiPanelBody"></div>
+    </div>
+
+    <div id="results">
+      <div class="empty">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="2"/><path d="M16.24 7.76a6 6 0 0 1 0 8.49M7.76 16.24a6 6 0 0 1 0-8.49M20.07 4.93a10 10 0 0 1 0 14.14M3.93 19.07a10 10 0 0 1 0-14.14"/></svg>
+        <p>Configure filters in the sidebar and run a scan.</p>
+      </div>
+    </div>
+  </div>
+</div>
+</div><!-- /app -->
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+//  USER CONFIG — edit this block to add / remove users
+//  Keep this file in a secured internal network location.
+// ═══════════════════════════════════════════════════════════════
+const USERS=[
+  {id:"admin",   name:"Administrator",  pw:"ROSEA2024"},
+  {id:"im1",     name:"IM Officer",     pw:"Ocha2024"},
+  {id:"analyst", name:"Analyst",        pw:"Monitor24"},
+  // Add more: {id:"username", name:"Display Name", pw:"Password123"}
+];
+// ═══════════════════════════════════════════════════════════════
+
+let currentUser=null;
+
+function login(){
+  const id=document.getElementById("loginId").value.trim().toLowerCase();
+  const pw=document.getElementById("loginPw").value;
+  const user=USERS.find(u=>u.id===id&&u.pw===pw);
+  const errEl=document.getElementById("authErr");
+  if(user){
+    currentUser={id:user.id,name:user.name};
+    sessionStorage.setItem("rosea_auth",JSON.stringify(currentUser));
+    document.getElementById("authOverlay").style.display="none";
+    document.getElementById("app").style.display="block";
+    document.getElementById("userPill").textContent=user.name;
+    draw();
+  } else {
+    errEl.textContent="Incorrect user ID or password.";
+    errEl.style.display="block";
+    setTimeout(()=>errEl.style.display="none",3000);
+  }
+}
+
+function logout(){
+  sessionStorage.removeItem("rosea_auth");
+  currentUser=null;
+  document.getElementById("authOverlay").style.display="flex";
+  document.getElementById("app").style.display="none";
+  document.getElementById("loginId").value="";
+  document.getElementById("loginPw").value="";
+  clrRes();
+}
+
+(function checkAuth(){
+  const s=sessionStorage.getItem("rosea_auth");
+  if(s){
+    currentUser=JSON.parse(s);
+    document.getElementById("authOverlay").style.display="none";
+    document.getElementById("app").style.display="block";
+    document.getElementById("userPill").textContent=currentUser.name;
+    draw();
+  }
+})();
+
+// ─── DATA ─────────────────────────────────────────────────────
+const COUNTRIES=[
+  ["angola","Angola"],["botswana","Botswana"],["burundi","Burundi"],["comoros","Comoros"],
+  ["djibouti","Djibouti"],["eritrea","Eritrea"],["eswatini","Eswatini"],["ethiopia","Ethiopia"],
+  ["kenya","Kenya"],["lesotho","Lesotho"],["madagascar","Madagascar"],["malawi","Malawi"],
+  ["mauritius","Mauritius"],["mozambique","Mozambique"],["namibia","Namibia"],["rwanda","Rwanda"],
+  ["seychelles","Seychelles"],["somalia","Somalia"],["south_africa","South Africa"],
+  ["south_sudan","South Sudan"],["sudan","Sudan"],["tanzania","Tanzania"],
+  ["uganda","Uganda"],["zambia","Zambia"],["zimbabwe","Zimbabwe"]
+];
+const REGIONS=[
+  {id:"horn",name:"Horn of Africa",ids:["djibouti","eritrea","ethiopia","kenya","somalia","south_sudan","sudan"]},
+  {id:"greatlakes",name:"Great Lakes",ids:["burundi","rwanda","tanzania","uganda"]},
+  {id:"southern",name:"Southern Africa",ids:["angola","botswana","comoros","eswatini","lesotho","madagascar","malawi","mauritius","mozambique","namibia","seychelles","south_africa","zambia","zimbabwe"]}
+];
+const THEMES=[
+  ["conflict","Conflict & insecurity","conflict"],["displacement","Displacement & refugees","displacement"],
+  ["food","Food insecurity & famine","food"],["health","Health emergencies","health"],
+  ["climate","Climate & disasters","climate"],["political","Political instability","political"]
+];
+const THEME_KEYS={
+  conflict:["conflict","violence","attack","armed","clashes","insecurity","fighting","war","militia","rebel","airstrike","bombing","atrocity"],
+  displacement:["displacement","refugee","idp","flee","exodus","camp","asylum","shelter","returnee","internally displaced"],
+  food:["food","famine","hunger","malnutrition","crop","harvest","ipc","acute food","starvation","ration","food security","food insecurity"],
+  health:["cholera","outbreak","epidemic","disease","measles","mpox","malaria","vaccination","polio","ebola","health emergency"],
+  climate:["flood","cyclone","drought","earthquake","storm","landslide","disaster","el nino","wildfire","hurricane","tropical","heavy rainfall"],
+  political:["election","coup","protest","unrest","government","political","instability","ceasefire","peace deal","sanctions","crackdown","state of emergency"]
+};
+
+// Official OCHA ROSEA sweep keywords per country
+const COUNTRY_KW={
+  angola:["floods","drought","displacement","refugees","food insecurity","cholera","measles","malnutrition","heavy rainfall"],
+  botswana:["floods","drought","food insecurity","disease outbreak","cyclone","aid response"],
+  burundi:["humanitarian crisis","floods","IDPs","displacement","refugees","food insecurity","cholera","measles","mpox","violence","landslide","heavy rainfall","insecurity","protection"],
+  comoros:["floods","cyclone","disease outbreak"],
+  djibouti:["humanitarian crisis","drought","displacement","refugees","food insecurity","cholera","protection concerns","aid response"],
+  eritrea:["humanitarian crisis","drought","displacement","refugees","food insecurity","conflict","armed clashes","disease outbreak","protection concerns","aid response"],
+  eswatini:["humanitarian crisis","floods","drought","refugees","food insecurity","cholera","disease outbreak"],
+  ethiopia:["humanitarian crisis","floods","drought","displacement","refugees","food insecurity","cholera","measles","mpox","malnutrition","earthquake","conflict","violence","armed clashes","emergency response","humanitarian access","landslide","insecurity","protection concerns","aid response"],
+  kenya:["humanitarian crisis","floods","drought","displacement","refugees","food insecurity","cholera","measles","malnutrition","conflict","violence","disease outbreak","emergency response","landslide","insecurity","aid response","disaster declaration"],
+  lesotho:["drought","food insecurity","cold wave","heavy rainfall"],
+  madagascar:["humanitarian crisis","floods","drought","displacement","refugees","food insecurity","cholera","mpox","malnutrition","cyclone","conflict","violence","disease outbreak","emergency response","humanitarian access","insecurity","aid response","disaster declaration"],
+  malawi:["humanitarian crisis","floods","drought","displacement","refugees","food insecurity","cholera","measles","malnutrition","cyclone","disease outbreak","emergency response","landslide","insecurity","protection concerns","aid response","disaster declaration"],
+  mauritius:["floods","cyclone","disease outbreak","emergency response"],
+  mozambique:["humanitarian crisis","floods","drought","displacement","refugees","food insecurity","cholera","measles","malnutrition","cyclone","conflict","violence","armed clashes","disease outbreak","emergency response","humanitarian access","insecurity","protection concerns","aid response","disaster declaration"],
+  namibia:["floods","drought","refugees","food insecurity","cyclone","disease outbreak","emergency response","heavy rainfall","disaster declaration"],
+  rwanda:["humanitarian crisis","floods","displacement","refugees","food insecurity","cholera","disease outbreak","protection concerns"],
+  seychelles:["cyclone","emergency response"],
+  somalia:["humanitarian crisis","floods","drought","displacement","refugees","food insecurity","cholera","measles","malnutrition","cyclone","conflict","violence","armed clashes","disease outbreak","emergency response","humanitarian access","landslide","insecurity","protection concerns","aid response","disaster declaration"],
+  south_africa:["floods","drought","FMD","refugees","violence","heavy rainfall","disaster declaration"],
+  south_sudan:["humanitarian crisis","floods","drought","displacement","refugees","food insecurity","cholera","measles","malnutrition","cyclone","conflict","violence","armed clashes","disease outbreak","emergency response","humanitarian access","insecurity","protection concerns","aid response","disaster declaration"],
+  sudan:["humanitarian crisis","floods","drought","displacement","refugees","food insecurity","cholera","measles","malnutrition","cyclone","conflict","violence","armed clashes","disease outbreak","emergency response","humanitarian access","landslide","famine","insecurity","protection concerns","aid response","disaster declaration"],
+  tanzania:["floods","drought","refugees","food insecurity","cholera","cyclone","violence","disease outbreak","landslide","heavy rainfall","protection"],
+  uganda:["humanitarian crisis","floods","drought","displacement","refugees","food insecurity","cholera","measles","mpox","Ebola","malnutrition","conflict","violence","disease outbreak","emergency response","humanitarian access","landslide","insecurity","protection concerns","aid response"],
+  zambia:["floods","drought","refugees","food insecurity","cyclone","disease outbreak","heavy rainfall"],
+  zimbabwe:["humanitarian crisis","floods","drought","refugees","food insecurity","cholera","measles","malnutrition","cyclone","disease outbreak","emergency response","heavy rainfall","protection","aid response"]
+};
+
+// Country-specific media outlets from the ROSEA sweep list
+const COUNTRY_MEDIA={
+  angola:["jornaldeangola.ao","angolatelegraph.com","angop.ao"],
+  botswana:["dailynews.gov.bw","thegazette.news"],
+  burundi:["abpinfo.bi","iwacu-burundi.org","burundi-agnews.org"],
+  comoros:["habariazacomores.com"],djibouti:["adi.dj"],eritrea:["shabait.com"],
+  ethiopia:["ena.et","addisstandard.com","borkena.com","waltainfo.com"],
+  kenya:["citizen.digital","capitalfm.co.ke","nation.africa","standardmedia.co.ke","the-star.co.ke"],
+  lesotho:["lesothotribune.co.ls"],
+  madagascar:["midi-madagasikara.mg","lagazette-dgi.com","lexpress.mg"],
+  malawi:["malawivoice.com","malawi24.com","nyasatimes.com","times.mw"],
+  mauritius:["lexpress.mu"],mozambique:["carta.co.mz","clubofmozambique.com"],
+  namibia:["namibian.com.na","nampa.org","neweralive.na"],
+  rwanda:["ktpress.rw","newtimes.co.rw"],
+  seychelles:["nation.sc","seychellesnewsagency.com"],
+  somalia:["garoweonline.com","shabelle.net","hiiraan.com"],
+  south_africa:["dailymaverick.co.za","ewn.co.za","mg.co.za","news24.com"],
+  south_sudan:["eyeradio.org","radiotamazuj.org"],
+  sudan:["dabangasudan.org","sudantribune.com"],
+  tanzania:["dailynews.co.tz","thecitizen.co.tz"],
+  uganda:["monitor.co.ug","independent.co.ug","newvision.co.ug"],
+  zambia:["lusakatimes.com","times.co.zm","daily-mail.co.zm"],
+  zimbabwe:["herald.co.zw","newsday.co.zw","newzimbabwe.com","theindependent.co.zw"]
+};
+
+let sc=new Set(COUNTRIES.map(x=>x[0]));
+let st=new Set(THEMES.map(x=>x[0]));
+let allAlerts=[];let activeTab="all";let activeCountry="all";
+let customKeywords=[];let customSites=[];
+let collapsed={horn:false,greatlakes:false,southern:false};
+
+// ─── SWEEP KEYWORDS ───────────────────────────────────────────
+function loadSweepKw(){
+  let added=0;
+  for(const [id] of COUNTRIES){
+    if(!sc.has(id))continue;
+    for(const kw of (COUNTRY_KW[id]||[])){
+      if(!customKeywords.includes(kw)){customKeywords.push(kw);added++;}
+    }
+  }
+  renderKwTags();
+  if(!added)alert("All sweep keywords for selected countries are already loaded.");
+}
+function addKw(){
+  const inp=document.getElementById("kwInput"),val=inp.value.trim();
+  if(!val)return;
+  val.split(",").map(v=>v.trim()).filter(Boolean).forEach(v=>{if(!customKeywords.includes(v))customKeywords.push(v);});
+  inp.value="";renderKwTags();
+}
+function removeKw(i){customKeywords.splice(i,1);renderKwTags();}
+function renderKwTags(){
+  document.getElementById("kwTags").innerHTML=customKeywords.map((kw,i)=>
+    `<span class="kw-tag">${kw}<button onclick="removeKw(${i})">&#xD7;</button></span>`).join("");
+}
+
+// ─── MEDIA SITES ──────────────────────────────────────────────
+function addSite(){
+  const inp=document.getElementById("siteInput");
+  const raw=inp.value.trim().toLowerCase().replace(/^https?:\/\//,"").replace(/\/.*$/,"");
+  if(!raw)return;
+  raw.split(",").map(v=>v.trim().replace(/^https?:\/\//,"").replace(/\/.*$/,"")).filter(Boolean).forEach(v=>{
+    if(!customSites.includes(v))customSites.push(v);
+  });
+  inp.value="";renderSiteTags();
+}
+function removeSite(i){customSites.splice(i,1);renderSiteTags();}
+function renderSiteTags(){
+  const useAuto=document.getElementById("useCountryMedia").checked;
+  let autoSites=[];
+  if(useAuto){
+    for(const [id] of COUNTRIES){if(sc.has(id)&&COUNTRY_MEDIA[id])autoSites.push(...COUNTRY_MEDIA[id]);}
+    autoSites=[...new Set(autoSites)];
+  }
+  document.getElementById("siteTags").innerHTML=
+    autoSites.map(s=>`<span class="site-tag auto-tag" title="From sweep list">${s}</span>`).join("")+
+    customSites.map((s,i)=>`<span class="site-tag">${s}<button onclick="removeSite(${i})">&#xD7;</button></span>`).join("");
+}
+
+// ─── DRAW UI ──────────────────────────────────────────────────
+function draw(){
+  let html="";
+  for(const reg of REGIONS){
+    const ccs=reg.ids.map(id=>COUNTRIES.find(c=>c[0]===id)).filter(Boolean);
+    const col=collapsed[reg.id];
+    const sel=ccs.filter(([id])=>sc.has(id)).length;
+    html+=`<div class="region-group">
+      <div class="region-hdr" onclick="toggleRegion('${reg.id}')">
+        <span class="region-name">${reg.name} <span class="cnt">${sel}/${ccs.length}</span></span>
+        <span class="region-arrow">${col?"&#9658;":"&#9660;"}</span>
+      </div>
+      <div class="region-tags${col?" collapsed":""}">
+        ${ccs.map(([id,nm])=>`<span class="tag${sc.has(id)?" on":""}" onclick="tC('${id}')">${nm}</span>`).join("")}
+      </div>
+    </div>`;
+  }
+  document.getElementById("ctags").innerHTML=html;
+  document.getElementById("ttags").innerHTML=THEMES.map(([id,nm,cls])=>
+    `<span class="ttag ${cls}${st.has(id)?" on":""}" onclick="tT('${id}')">${nm}</span>`).join("");
+  document.getElementById("cc").textContent=sc.size;
+}
+function toggleRegion(id){collapsed[id]=!collapsed[id];draw();}
+function tC(id){sc.has(id)?sc.delete(id):sc.add(id);draw();renderSiteTags();}
+function tT(id){st.has(id)?st.delete(id):st.add(id);draw();}
+function selAll(){sc=new Set(COUNTRIES.map(x=>x[0]));draw();renderSiteTags();}
+function clrAll(){sc=new Set();draw();renderSiteTags();}
+function setP(n){document.getElementById("pfill").style.width=n+"%";}
+function setStatus(m){const e=document.getElementById("statusTxt");e.style.display=m?"block":"none";if(m)e.textContent=m;}
+function showErr(m){const b=document.getElementById("errBanner");b.style.display="block";b.textContent=m;}
+function clrRes(){
+  document.getElementById("results").innerHTML=`<div class="empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:42px;height:42px;margin:0 auto 12px;opacity:.22;display:block"><circle cx="12" cy="12" r="2"/><path d="M16.24 7.76a6 6 0 0 1 0 8.49M7.76 16.24a6 6 0 0 1 0-8.49M20.07 4.93a10 10 0 0 1 0 14.14M3.93 19.07a10 10 0 0 1 0-14.14"/></svg><p>Configure filters and run a scan.</p></div>`;
+  setP(0);setStatus(false);
+  document.getElementById("errBanner").style.display="none";
+  document.getElementById("statsRow").style.display="none";
+  document.getElementById("srcTabs").style.display="none";
+  document.getElementById("countryFilterRow").style.display="none";
+  document.getElementById("infoBox").style.display="block";
+  allAlerts=[];activeTab="all";activeCountry="all";
+}
+
+// ─── HELPERS ──────────────────────────────────────────────────
+function detectTheme(text){
+  const t=(text||"").toLowerCase();let best="",bestScore=0;
+  for(const [th,keys] of Object.entries(THEME_KEYS)){
+    const s=keys.filter(k=>t.includes(k)).length;if(s>bestScore){bestScore=s;best=th;}
+  }
+  const map={conflict:"Conflict & insecurity",displacement:"Displacement & refugees",
+    food:"Food insecurity & famine",health:"Health emergencies",
+    climate:"Climate & disasters",political:"Political instability"};
+  return bestScore>0?(map[best]||"General"):"General";
+}
+function scoreSeverity(text){
+  const t=(text||"").toLowerCase();
+  if(["famine","level 3","l3 emergency","catastrophic","mass atrocity","thousands killed","mass displacement","genocide"].some(k=>t.includes(k)))return "critical";
+  if(["conflict","flood","cyclone","drought","displaced","outbreak","hunger","crisis","emergency","attack","deaths","casualties","evacuated","ipc phase 4","ipc phase 5","acute malnutrition","cholera","armed clashes","violence","famine","landslide","heavy rainfall"].some(k=>t.includes(k)))return "high";
+  if(["concern","alert","warning","deteriorating","worsening","affected","at risk","ipc phase 3","insecurity","protection","displacement","disease"].some(k=>t.includes(k)))return "medium";
+  return "monitor";
+}
+function filterByTheme(alerts){
+  if(!st.size)return alerts;
+  const themeMap={conflict:"Conflict & insecurity",displacement:"Displacement & refugees",
+    food:"Food insecurity & famine",health:"Health emergencies",
+    climate:"Climate & disasters",political:"Political instability"};
+  const active=new Set([...st].map(id=>themeMap[id]));
+  return alerts.filter(a=>active.has(a.theme)||a.theme==="General");
+}
+function dedup(alerts){
+  const seen=new Set();
+  return alerts.filter(a=>{
+    const k=a.title.slice(0,65).toLowerCase().replace(/\s+/g," ");
+    if(seen.has(k))return false;seen.add(k);return true;
+  });
+}
+function matchCountry(combined){
+  const t=combined.toLowerCase();
+  for(const [id,nm] of COUNTRIES){if(sc.has(id)&&t.includes(nm.toLowerCase()))return nm;}
+  return null;
+}
+function parseRSS(xmlStr){
+  try{
+    const xml=new DOMParser().parseFromString(xmlStr,"text/xml");
+    return Array.from(xml.querySelectorAll("item")).map(item=>({
+      title:item.querySelector("title")?.textContent||"",
+      desc:(item.querySelector("description")?.textContent||"").replace(/<[^>]+>/g," ").replace(/\s+/g," ").trim(),
+      link:item.querySelector("link")?.textContent||"",
+      pubDate:item.querySelector("pubDate")?.textContent||""
+    }));
+  }catch(e){return [];}
+}
+
+// ─── PROXY FETCH (races 3 proxies — whichever responds first wins) ────────────
+// Helper: safe AbortSignal.timeout() — falls back for older browsers
+function mkSignal(ms){
+  try{return AbortSignal.timeout(ms);}
+  catch(e){const c=new AbortController();setTimeout(()=>c.abort(),ms);return c.signal;}
+}
+async function proxyFetch(url,timeout=11000){
+  return new Promise(resolve=>{
+    let done=false;
+    // Accept only non-trivial responses (>80 chars avoids HTML error splash pages)
+    const ok=v=>{if(!done&&v&&typeof v==="string"&&v.length>80){done=true;resolve(v);}};
+    const fail=()=>{};
+    // Proxy 1 — allorigins.win (returns JSON wrapper {contents:...})
+    fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(url)}`,{signal:mkSignal(timeout)})
+      .then(r=>r.json()).then(j=>{if(j&&j.contents)ok(j.contents);}).catch(fail);
+    // Proxy 2 — corsproxy.io (returns raw text)
+    fetch(`https://corsproxy.io/?${encodeURIComponent(url)}`,{signal:mkSignal(timeout)})
+      .then(r=>r.ok?r.text():Promise.reject()).then(t=>ok(t)).catch(fail);
+    // Proxy 3 — codetabs (third fallback, often succeeds when others are slow)
+    fetch(`https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(url)}`,{signal:mkSignal(timeout)})
+      .then(r=>r.ok?r.text():Promise.reject()).then(t=>ok(t)).catch(fail);
+    // Hard deadline — resolves null so callers get a clean empty result
+    setTimeout(()=>{if(!done){done=true;resolve(null);}},timeout+500);
+  });
+}
+
+// ─── SOURCE 1: ReliefWeb API ──────────────────────────────────
+async function fetchReliefWeb(countries,days){
+  const results=[];
+  const since=new Date();since.setDate(since.getDate()-days);
+  const sinceStr=since.toISOString().split("T")[0];
+  for(let i=0;i<countries.length;i+=5){
+    const batch=countries.slice(i,i+5);
+    const params=[
+      "appname=rosea-monitor","preset=latest","limit=20",
+      "fields[include][]=title","fields[include][]=body","fields[include][]=date.created",
+      "fields[include][]=source","fields[include][]=primary_country","fields[include][]=url",
+      "filter[operator]=AND",`filter[conditions][0][field]=date.created`,
+      `filter[conditions][0][value][from]=${sinceStr}T00:00:00%2B00:00`,
+      "filter[conditions][1][operator]=OR",
+      ...batch.map((c,idx)=>`filter[conditions][1][conditions][${idx}][field]=primary_country.name&filter[conditions][1][conditions][${idx}][value]=${encodeURIComponent(c)}`),
+      "sort[]=date.created:desc"
+    ].join("&");
+    const text=await proxyFetch(`https://api.reliefweb.int/v1/reports?${params}`);
+    if(!text)continue;
+    try{
+      const data=JSON.parse(text);
+      for(const item of(data.data||[])){
+        const f=item.fields||{};
+        const country=(f.primary_country&&f.primary_country.name)||"";
+        const rawBody=(f.body||"").replace(/<[^>]+>/g," ").replace(/\s+/g," ").trim();
+        const combined=f.title+" "+rawBody;
+        results.push({title:f.title||"Untitled",country,theme:detectTheme(combined),severity:scoreSeverity(combined),
+          summary:(rawBody.slice(0,300)+(rawBody.length>300?"…":""))||f.title,
+          date:(f.date&&f.date.created||"").slice(0,10)||"recent",
+          source:(f.source||[]).map(s=>s.name).join(", ")||"ReliefWeb",
+          url:f.url||"https://reliefweb.int",dataSource:"reliefweb"});
+      }
+    }catch(e){}
+    if(i+5<countries.length)await new Promise(r=>setTimeout(r,300));
+  }
+  return results;
+}
+
+// ─── SOURCE 2: GDACS ─────────────────────────────────────────
+async function fetchGDACS(days){
+  const since=Date.now()-((days||30)*86400000);
+  const results=[];
+  const text=await proxyFetch("https://www.gdacs.org/xml/rss.xml");
+  if(!text)return results;
+  for(const {title,desc,link,pubDate} of parseRSS(text)){
+    const c=matchCountry(title+" "+desc);if(!c)continue;
+    if(pubDate){const t=new Date(pubDate).getTime();if(!isNaN(t)&&t<since)continue;}
+    results.push({title,country:c,theme:"Climate & disasters",severity:scoreSeverity(title+" "+desc),
+      summary:desc.slice(0,300)+(desc.length>300?"…":""),
+      date:pubDate?new Date(pubDate).toISOString().slice(0,10):"recent",
+      source:"GDACS / UN",url:link,dataSource:"gdacs"});
+  }
+  return results;
+}
+
+// ─── SOURCE 3: UN News Africa RSS ────────────────────────────
+async function fetchUNNews(days){
+  const since=Date.now()-((days||30)*86400000);
+  const results=[];
+  const text=await proxyFetch("https://news.un.org/feed/subscribe/en/news/region/africa/feed/rss.xml");
+  if(!text)return results;
+  for(const {title,desc,link,pubDate} of parseRSS(text)){
+    if(!title)continue;
+    if(pubDate){const t=new Date(pubDate).getTime();if(!isNaN(t)&&t<since)continue;}
+    const c=matchCountry(title+" "+desc)||"Africa";
+    results.push({title,country:c,theme:detectTheme(title+" "+desc),severity:scoreSeverity(title+" "+desc),
+      summary:desc.slice(0,300)+(desc.length>300?"…":""),
+      date:pubDate?new Date(pubDate).toISOString().slice(0,10):"recent",
+      source:"UN News",url:link,dataSource:"unnews"});
+  }
+  return results;
+}
+
+// ─── SOURCE 4: WHO Disease Outbreak News ─────────────────────
+async function fetchWHO(days){
+  const since=Date.now()-((days||30)*86400000);
+  const results=[];
+  const text=await proxyFetch("https://www.who.int/feeds/entity/emergencies/diseases/en/rss.xml");
+  if(!text)return results;
+  for(const {title,desc,link,pubDate} of parseRSS(text)){
+    if(!title)continue;
+    if(pubDate){const t=new Date(pubDate).getTime();if(!isNaN(t)&&t<since)continue;}
+    const c=matchCountry(title+" "+desc)||"Africa";
+    results.push({title,country:c,theme:"Health emergencies",severity:scoreSeverity(title+" "+desc),
+      summary:desc.slice(0,300)+(desc.length>300?"…":""),
+      date:pubDate?new Date(pubDate).toISOString().slice(0,10):"recent",
+      source:"WHO",url:link,dataSource:"who"});
+  }
+  return results;
+}
+
+// ─── SOURCE 5: FEWS NET Food Security Alerts ─────────────────
+async function fetchFEWSNET(days){
+  const since=Date.now()-((days||30)*86400000);
+  const results=[];
+  const text=await proxyFetch("https://fews.net/rss.xml");
+  if(!text)return results;
+  for(const {title,desc,link,pubDate} of parseRSS(text)){
+    if(!title)continue;
+    if(pubDate){const t=new Date(pubDate).getTime();if(!isNaN(t)&&t<since)continue;}
+    const c=matchCountry(title+" "+desc)||"Africa";
+    results.push({title,country:c,theme:"Food insecurity & famine",severity:scoreSeverity(title+" "+desc),
+      summary:desc.slice(0,300)+(desc.length>300?"…":""),
+      date:pubDate?new Date(pubDate).toISOString().slice(0,10):"recent",
+      source:"FEWS NET",url:link,dataSource:"fewsnet"});
+  }
+  return results;
+}
+
+// ─── SOURCE 6: AllAfrica RSS ──────────────────────────────────
+async function fetchAllAfrica(days){
+  const since=Date.now()-((days||30)*86400000);
+  const results=[];
+  const text=await proxyFetch("https://allafrica.com/tools/headlines/rdf/africa/headlines.rdf");
+  if(!text)return results;
+  for(const {title,desc,link,pubDate} of parseRSS(text)){
+    if(!title)continue;
+    if(pubDate){const t=new Date(pubDate).getTime();if(!isNaN(t)&&t<since)continue;}
+    const c=matchCountry(title+" "+desc);if(!c)continue;
+    results.push({title,country:c,theme:detectTheme(title+" "+desc),severity:scoreSeverity(title+" "+desc),
+      summary:desc.slice(0,300)+(desc.length>300?"…":""),
+      date:pubDate?new Date(pubDate).toISOString().slice(0,10):"recent",
+      source:"AllAfrica",url:link,dataSource:"allafrica"});
+  }
+  return results;
+}
+
+// ─── SOURCE 7: Google News RSS (with 3 speed modes) ──────────
+async function fetchGoogleNews(countries,days){
+  const results=[];
+  const since=Date.now()-(days*86400000);
+  const mode=document.getElementById("scanMode").value;
+  const useMedia=document.getElementById("useCountryMedia").checked;
+  const kwStr=customKeywords.length>0
+    ?customKeywords.slice(0,50).map(k=>k.includes(" ")?`"${k}"`:k).join(" OR ")
+    :null;
+
+  // Master humanitarian keyword string — covers all themes in one query
+  const MASTER_KW="humanitarian OR conflict OR refugees OR famine OR cholera OR floods OR drought OR cyclone OR displacement OR outbreak OR malnutrition OR violence OR earthquake OR \"food insecurity\" OR \"disease outbreak\" OR \"armed clashes\" OR emergency OR landslide OR mpox OR ebola OR IPC";
+  const ORG_KW=`OCHA OR UNHCR OR WFP OR UNICEF OR ICRC OR MSF OR "humanitarian crisis"`;
+
+  // Pan-African outlets always searched (very high signal-to-noise)
+  const PAN_AFRICAN=["allafrica.com","thenewhumanitarian.org","theafricareport.com"];
+
+  // Regional group terminology catches multi-country articles
+  const REGIONAL=[
+    {q:`"Horn of Africa" (${MASTER_KW})`,country:"Horn of Africa"},
+    {q:`"East Africa" (${MASTER_KW})`,country:"East Africa"},
+    {q:`"Southern Africa" (${MASTER_KW})`,country:"Southern Africa"},
+    {q:`"Great Lakes" (conflict OR displacement OR refugees OR crisis OR violence)`,country:"Great Lakes"},
+    {q:`"Eastern Africa" (${MASTER_KW})`,country:"Eastern Africa"}
+  ];
+
+  const queries=[];
+  const idMap=Object.fromEntries(COUNTRIES.map(([id,nm])=>[nm,id]));
+
+  // ── QUICK mode — plain country query (no keyword gate) + optional keyword boost
+  if(mode==="quick"){
+    // Broad: catches ALL recent news about each country — keywords are optional guidance only
+    for(const c of countries) queries.push({q:`"${c}"`,country:c});
+    // If sweep keywords loaded, add keyword-targeted queries alongside (extra precision layer)
+    if(kwStr) for(const c of countries) queries.push({q:`"${c}" (${kwStr})`,country:c});
+    // Org sweeps
+    [[0,9],[9,18],[18]].map(r=>countries.slice(...r)).filter(x=>x.length).forEach(chunk=>
+      queries.push({q:`(${ORG_KW}) (${chunk.map(c=>`"${c}"`).join(" OR ")})`,country:"ROSEA region"}));
+  }
+
+  // ── STANDARD mode — broad + keyword-guided per country ────────────────────
+  else if(mode==="standard"){
+    // Plain broad query per country — no keyword gate, maximum recall
+    for(const c of countries) queries.push({q:`"${c}"`,country:c});
+    // Sweep keywords (supplemental precision — guides but does not replace broad query)
+    if(kwStr) for(const c of countries) queries.push({q:`"${c}" (${kwStr})`,country:c});
+    // MASTER_KW guided query — targeted humanitarian coverage
+    for(const c of countries) queries.push({q:`"${c}" (${MASTER_KW})`,country:c});
+    // Regional sweeps (chunks of 5)
+    for(let i=0;i<countries.length;i+=5){
+      const chunk=countries.slice(i,i+5).map(c=>`"${c}"`).join(" OR ");
+      queries.push({q:`(${chunk}) (${MASTER_KW})`,country:"ROSEA region"});
+    }
+    // Org sweeps
+    [[0,9],[9,18],[18]].map(r=>countries.slice(...r)).filter(x=>x.length).forEach(chunk=>
+      queries.push({q:`(${ORG_KW}) (${chunk.map(c=>`"${c}"`).join(" OR ")})`,country:"ROSEA region"}));
+    // Regional terminology
+    queries.push(...REGIONAL);
+    // Pan-African outlets — regional queries (not per country, much faster)
+    for(const site of PAN_AFRICAN){
+      queries.push({q:`site:${site} (${MASTER_KW})`,country:"ROSEA region"});
+    }
+    // Country media sites
+    if(useMedia){
+      for(const c of countries){
+        for(const site of (COUNTRY_MEDIA[idMap[c]]||[])) queries.push({q:`site:${site}`,country:c});
+      }
+    }
+  }
+
+  // ── FULL mode (~250+ queries, maximum coverage) ────────────────────────────
+  else{
+    const THEME_KW={
+      conflict:"conflict OR clashes OR violence OR insecurity OR war OR militia OR ceasefire OR airstrike OR \"armed clashes\" OR atrocity OR \"civilian deaths\"",
+      displacement:"refugees OR displacement OR IDP OR asylum OR fleeing OR \"refugee camp\" OR returnees OR UNHCR OR \"internally displaced\"",
+      food:"famine OR hunger OR malnutrition OR \"food crisis\" OR \"food insecurity\" OR WFP OR starvation OR \"crop failure\" OR IPC OR \"acute food insecurity\"",
+      health:"cholera OR outbreak OR epidemic OR measles OR malaria OR ebola OR mpox OR \"health emergency\" OR WHO OR vaccination OR \"disease outbreak\" OR polio",
+      climate:"floods OR cyclone OR drought OR earthquake OR disaster OR landslide OR flooding OR heatwave OR \"heavy rainfall\" OR \"natural disaster\" OR \"El Nino\"",
+      political:"coup OR protests OR unrest OR \"political crisis\" OR sanctions OR \"state of emergency\" OR crackdown OR election OR \"political instability\""
+    };
+    // Sweep keywords
+    if(kwStr){
+      for(const c of countries) queries.push({q:`"${c}" (${kwStr})`,country:c});
+      for(let i=0;i<countries.length;i+=5){
+        const chunk=countries.slice(i,i+5).map(c=>`"${c}"`).join(" OR ");
+        queries.push({q:`(${chunk}) (${kwStr})`,country:"ROSEA region"});
+      }
+    }
+    // Plain broad query per country — catches anything MASTER_KW might miss
+    for(const c of countries) queries.push({q:`"${c}"`,country:c});
+    // Combined MASTER_KW query per country
+    for(const c of countries) queries.push({q:`"${c}" (${MASTER_KW})`,country:c});
+    // Per-theme per-country
+    for(const c of countries){
+      for(const [,kw] of Object.entries(THEME_KW)) queries.push({q:`"${c}" (${kw})`,country:c});
+    }
+    // Regional chunks
+    for(let i=0;i<countries.length;i+=4){
+      const chunk=countries.slice(i,i+4).map(c=>`"${c}"`).join(" OR ");
+      queries.push({q:`(${chunk}) (${MASTER_KW})`,country:"ROSEA region"});
+    }
+    // All org sweeps
+    const ORGS=["OCHA","UNHCR","WFP","UNICEF","ICRC","MSF","\"Save the Children\"","\"humanitarian crisis\"","\"humanitarian aid\"","IOM"];
+    [[0,9],[9,18],[18]].map(r=>countries.slice(...r)).filter(x=>x.length).forEach(chunk=>{
+      for(const org of ORGS) queries.push({q:`${org} (${chunk.map(c=>`"${c}"`).join(" OR ")})`,country:"ROSEA region"});
+    });
+    // Regional terminology
+    queries.push(...REGIONAL);
+    // Pan-African outlets per country
+    for(const site of PAN_AFRICAN){
+      for(const c of countries) queries.push({q:`site:${site} "${c}"`,country:c});
+      queries.push({q:`site:${site} (${MASTER_KW})`,country:"ROSEA region"});
+    }
+    // Country media (2 queries per site)
+    if(useMedia){
+      for(const c of countries){
+        for(const site of (COUNTRY_MEDIA[idMap[c]]||[])){
+          queries.push({q:`site:${site}`,country:c});
+          queries.push({q:`site:${site} (${MASTER_KW})`,country:c});
+        }
+      }
+    }
+  }
+
+  // Custom sites (always, all modes)
+  if(customSites.length>0){
+    for(const site of customSites){
+      [[0,9],[9,18],[18]].map(r=>countries.slice(...r)).filter(x=>x.length).forEach(chunk=>
+        queries.push({q:`site:${site} (${chunk.map(c=>`"${c}"`).join(" OR ")})`,country:"ROSEA region"}));
+      if(kwStr)queries.push({q:`site:${site} (${kwStr})`,country:"ROSEA region"});
+    }
+  }
+
+  // Batch params per mode
+  const BATCH=mode==="quick"?18:mode==="standard"?14:7;
+  const DELAY=mode==="quick"?60:mode==="standard"?100:220;
+  const TO   =mode==="quick"?10000:mode==="standard"?10000:12000;
+  // Server-side date hint — tells Google News to only index articles from the chosen window
+  const whenHint=days<=30?` when:${days}d`:"";
+  let done=0;
+
+  async function fetchOne({q,country}){
+    try{
+      const rssUrl=`https://news.google.com/rss/search?q=${encodeURIComponent(q+whenHint)}&hl=en-US&gl=US&ceid=US:en`;
+      const text=await proxyFetch(rssUrl,TO);
+      if(!text)return;
+      for(const {title,desc,link,pubDate} of parseRSS(text)){
+        if(!title)continue;
+        // Client-side date backstop: reject if pubDate parses and is older than window
+        if(pubDate){
+          const t=new Date(pubDate).getTime();
+          if(!isNaN(t)&&t<since)continue;
+        }
+        const matched=matchCountry(title+" "+desc)||country;
+        results.push({title,country:matched,
+          theme:detectTheme(title+" "+desc),severity:scoreSeverity(title+" "+desc),
+          summary:desc.slice(0,320)+(desc.length>320?"…":""),
+          date:pubDate?new Date(pubDate).toISOString().slice(0,10):"recent",
+          source:new DOMParser().parseFromString(text,"text/xml").querySelector("item source")?.textContent||"Google News",
+          url:link,dataSource:"googlenews"});
+      }
+    }catch(e){}
+    done++;
+    setStatus(`Google News — ${done}/${queries.length} queries complete…`);
+  }
+
+  for(let i=0;i<queries.length;i+=BATCH){
+    await Promise.all(queries.slice(i,i+BATCH).map(fetchOne));
+    if(i+BATCH<queries.length)await new Promise(r=>setTimeout(r,DELAY));
+  }
+  return results;
+}
+
+// ─── MAIN SCAN ────────────────────────────────────────────────
+async function runScan(){
+  document.getElementById("errBanner").style.display="none";
+  document.getElementById("infoBox").style.display="none";
+  if(!sc.size){showErr("Select at least one country.");return;}
+  if(!st.size){showErr("Select at least one theme.");return;}
+
+  const btn=document.getElementById("scanBtn");
+  btn.disabled=true;
+  btn.innerHTML=`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg> Scanning…`;
+
+  const countries=COUNTRIES.filter(x=>sc.has(x[0])).map(x=>x[1]);
+  const days=parseInt(document.getElementById("tf").value);
+  const srcSel=document.getElementById("srcSel").value;
+  const mode=document.getElementById("scanMode").value;
+  const modeLabel={quick:"Quick",standard:"Standard",full:"Full"};
+
+  document.getElementById("statsRow").style.display="none";
+  document.getElementById("srcTabs").style.display="none";
+  document.getElementById("countryFilterRow").style.display="none";
+  document.getElementById("results").innerHTML=`<div class="empty"><p style="color:var(--text2)">Connecting to sources…</p></div>`;
+  setP(8);
+
+  let combined=[];
+  try{
+    const isAll=srcSel==="all";
+    const isFeeds=srcSel==="feeds";
+
+    if(isAll||srcSel==="reliefweb"){
+      setStatus("ReliefWeb — fetching OCHA reports…");setP(15);
+      combined.push(...await fetchReliefWeb(countries,days));
+      setP(25);
+    }
+    if(isAll||srcSel==="gdacs"){
+      setStatus("GDACS — fetching disaster alerts…");
+      combined.push(...await fetchGDACS(days));setP(33);
+    }
+    if(isAll||isFeeds){
+      setStatus("UN News — fetching Africa RSS feed…");
+      combined.push(...await fetchUNNews(days));setP(40);
+      setStatus("WHO — fetching disease outbreak news…");
+      combined.push(...await fetchWHO(days));setP(47);
+      setStatus("FEWS NET — fetching food security alerts…");
+      combined.push(...await fetchFEWSNET(days));setP(54);
+      setStatus("AllAfrica — fetching Africa headlines RSS…");
+      combined.push(...await fetchAllAfrica(days));setP(60);
+    }
+    if(isAll||srcSel==="googlenews"){
+      setStatus(`Google News [${modeLabel[mode]}] — ${countries.length} countries${customKeywords.length?" + "+customKeywords.length+" keywords":""}…`);
+      const gn=await fetchGoogleNews(countries,days);
+      combined.push(...gn);setP(92);
+    }
+
+    setStatus("Deduplicating and ranking results…");
+    let alerts=dedup(filterByTheme(combined));
+    const ord={critical:0,high:1,medium:2,monitor:3};
+    // Sort: humanitarian themes first → by severity → newest date first
+    alerts.sort((a,b)=>{
+      const ha=a.theme==="General"?1:0, hb=b.theme==="General"?1:0;
+      if(ha!==hb)return ha-hb;
+      const s=(ord[a.severity]??3)-(ord[b.severity]??3);
+      if(s)return s;
+      return new Date(b.date||0)-new Date(a.date||0);
+    });
+    setP(100);setStatus(false);
+
+    if(!alerts.length){
+      document.getElementById("results").innerHTML=`<div class="empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:42px;height:42px;margin:0 auto 12px;opacity:.22;display:block"><circle cx="12" cy="12" r="2"/><path d="M16.24 7.76a6 6 0 0 1 0 8.49M7.76 16.24a6 6 0 0 1 0-8.49M20.07 4.93a10 10 0 0 1 0 14.14M3.93 19.07a10 10 0 0 1 0-14.14"/></svg><p>No alerts found. Try a longer time window or more countries.</p></div>`;
+    } else {
+      allAlerts=alerts;activeTab="all";activeCountry="all";
+      buildSourceTabs(alerts);buildCountryDropdown(alerts);
+      renderAlerts(alerts,false);
+      maybeAutoAnalyze();
+    }
+  }catch(e){
+    showErr("Scan error: "+e.message);setStatus(false);
+    document.getElementById("results").innerHTML=`<div class="empty"><p>Scan failed. Check your connection and try again.</p></div>`;
+  }finally{
+    btn.disabled=false;
+    btn.innerHTML=`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="2"/><path d="M16.24 7.76a6 6 0 0 1 0 8.49M7.76 16.24a6 6 0 0 1 0-8.49M20.07 4.93a10 10 0 0 1 0 14.14M3.93 19.07a10 10 0 0 1 0-14.14"/></svg> Run scan`;
+    setTimeout(()=>setP(0),1600);
+  }
+}
+
+// ─── POST-SCAN UI ─────────────────────────────────────────────
+const SOURCE_LABEL={
+  reliefweb:"ReliefWeb",gdacs:"GDACS",unnews:"UN News",
+  who:"WHO",fewsnet:"FEWS NET",allafrica:"AllAfrica",googlenews:"Google News"
+};
+function buildSourceTabs(alerts){
+  const srcs=["all",...new Set(alerts.map(a=>a.dataSource))];
+  const tabsEl=document.getElementById("srcTabs");
+  tabsEl.innerHTML=srcs.map((s,i)=>{
+    const cnt=s==="all"?alerts.length:alerts.filter(a=>a.dataSource===s).length;
+    const label=s==="all"?"All":SOURCE_LABEL[s]||s;
+    return `<button class="src-pill-btn${i===0?" active":""}" onclick="filterTab('${s}',this)">${label} <span class="cnt">${cnt}</span></button>`;
+  }).join("");
+  tabsEl.style.display="flex";
+}
+function buildCountryDropdown(alerts){
+  const counts={};alerts.forEach(a=>{counts[a.country]=(counts[a.country]||0)+1;});
+  const sel=document.getElementById("countrySel");
+  sel.innerHTML=`<option value="all">All countries (${alerts.length})</option>`+
+    Object.keys(counts).sort().map(c=>`<option value="${c}">${c} (${counts[c]})</option>`).join("");
+  document.getElementById("countryFilterRow").style.display="flex";
+}
+function filterTab(src,el){
+  activeTab=src;activeCountry="all";
+  document.getElementById("countrySel").value="all";
+  document.querySelectorAll(".src-pill-btn").forEach(b=>b.classList.remove("active"));
+  el.classList.add("active");
+  renderAlerts(src==="all"?allAlerts:allAlerts.filter(a=>a.dataSource===src),true);
+}
+function applyCountryFilter(){
+  activeCountry=document.getElementById("countrySel").value;
+  const base=activeTab==="all"?allAlerts:allAlerts.filter(a=>a.dataSource===activeTab);
+  renderAlerts(activeCountry==="all"?base:base.filter(a=>a.country===activeCountry),true);
+}
+
+function renderAlerts(alerts,skipStats){
+  if(!skipStats){
+    const c={critical:0,high:0,medium:0,monitor:0};
+    allAlerts.forEach(a=>c[a.severity]!=null?c[a.severity]++:c.monitor++);
+    const sr=document.getElementById("statsRow");sr.style.display="flex";
+    sr.innerHTML=[["Total",allAlerts.length,""],["Critical",c.critical,"color:var(--red-text)"],
+      ["High",c.high,"color:var(--amber-text)"],["Medium",c.medium,"color:var(--blue-text)"]]
+      .map(([k,v,s])=>`<div class="scard"><div class="v" style="${s}">${v}</div><div class="k">${k}</div></div>`).join("");
+  }
+  const pin=`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>`;
+  const tagI=`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>`;
+  const cal=`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>`;
+  const extI=`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>`;
+
+  // ── card renderer (shared between sections) ──
+  function cardHtml(a){
+    return `<div class="acard ${a.severity||"monitor"}">
+      <div class="atop">
+        <span class="atitle">${a.url?`<a href="${a.url}" target="_blank" rel="noopener">${a.title}</a>`:a.title}</span>
+        <span class="badge ${a.severity||"monitor"}">${(a.severity||"monitor").toUpperCase()}</span>
+      </div>
+      <p class="asum">${a.summary||""}</p>
+      <div class="ameta">
+        <span class="mt">${pin}${a.country}</span>
+        <span class="mt">${tagI}${a.theme}</span>
+        <span class="mt">${cal}${a.date||"Recent"}</span>
+        <span class="apill">${a.source}</span>
+        ${a.url?`<a class="read-more" href="${a.url}" target="_blank" rel="noopener">${extI} Full report</a>`:""}
+      </div>
+    </div>`;
+  }
+
+  const THEME_ORDER=["Conflict & insecurity","Displacement & refugees","Food insecurity & famine","Health emergencies","Climate & disasters","Political instability"];
+  const THEME_ICON={"Conflict & insecurity":"⚔","Displacement & refugees":"🏕","Food insecurity & famine":"🌾","Health emergencies":"🏥","Climate & disasters":"🌊","Political instability":"🗳"};
+  const sevOrd2={critical:0,high:1,medium:2,monitor:3};
+  const bySevDate=(a,b)=>{const s=(sevOrd2[a.severity]??3)-(sevOrd2[b.severity]??3);return s||new Date(b.date||0)-new Date(a.date||0);};
+
+  // Split results
+  const humAlerts=alerts.filter(a=>a.theme!=="General").sort(bySevDate);
+  const otherAlerts=alerts.filter(a=>a.theme==="General").sort(bySevDate);
+
+  const srcLabel=activeTab!=="all"?` &middot; ${SOURCE_LABEL[activeTab]||activeTab}`:"";
+  const cLabel=activeCountry!=="all"?` &middot; ${activeCountry}`:"";
+
+  let html=`<div class="rhdr">
+    <span class="rtitle">${alerts.length} result${alerts.length===1?"":"s"}${srcLabel}${cLabel}</span>
+    <div class="export-row">
+      <button class="abtn" onclick="exportWord()" style="background:var(--blue);color:#fff;border-color:var(--blue);">&#x1F4C4; Export .doc</button>
+      <button class="abtn" onclick="exportTxt()">Export .txt</button>
+      <button class="abtn" onclick="exportCSV()">Export .csv</button>
+    </div>
+  </div>`;
+
+  if(alerts.length===0){
+    html+=`<div class="empty"><p>No results for this filter.</p></div>`;
+  } else {
+    // ── SECTION 1: Humanitarian alerts grouped by theme ──────────
+    if(humAlerts.length){
+      html+=`<div class="sec-hdr hum">
+        <span class="sec-hdr-title">🔴 Humanitarian Alerts</span>
+        <span class="cnt" style="background:#FECDCA;color:#C0392B;border-color:#FECDCA;">${humAlerts.length}</span>
+      </div>`;
+      const byTheme={};
+      humAlerts.forEach(a=>(byTheme[a.theme]=byTheme[a.theme]||[]).push(a));
+      for(const th of THEME_ORDER){
+        if(!byTheme[th])continue;
+        html+=`<div class="theme-div">
+          <span class="theme-div-label">${THEME_ICON[th]||"•"} ${th}</span>
+          <span class="theme-div-line"></span>
+          <span class="theme-div-cnt">${byTheme[th].length}</span>
+        </div>`;
+        html+=byTheme[th].map(cardHtml).join("");
+      }
+    }
+
+    // ── SECTION 2: Other / general news ──────────────────────────
+    if(otherAlerts.length){
+      html+=`<div class="sec-hdr other" style="margin-top:${humAlerts.length?18:0}px;">
+        <span class="sec-hdr-title">📰 Other News</span>
+        <span class="cnt">${otherAlerts.length}</span>
+      </div>`;
+      html+=otherAlerts.map(cardHtml).join("");
+    }
+  }
+
+  document.getElementById("results").innerHTML=html;
+}
+
+function getList(){
+  const base=activeTab==="all"?allAlerts:allAlerts.filter(a=>a.dataSource===activeTab);
+  return activeCountry==="all"?base:base.filter(a=>a.country===activeCountry);
+}
+function exportTxt(){
+  const list=getList();if(!list.length)return;
+  const d=new Date().toLocaleDateString("en-GB",{day:"2-digit",month:"short",year:"numeric"});
+  let t=`ROSEA HUMANITARIAN MONITOR — SITUATION BRIEFING\nGenerated: ${d}  |  User: ${currentUser?.name||""}\n${"=".repeat(60)}\n`;
+  const byC={};list.forEach(a=>(byC[a.country]=byC[a.country]||[]).push(a));
+  for(const [country,items] of Object.entries(byC).sort()){
+    t+=`\n── ${country} ${"─".repeat(Math.max(0,52-country.length))}\n`;
+    items.forEach((a,i)=>{
+      t+=`${i+1}. [${(a.severity||"MONITOR").toUpperCase()}] ${a.title}\n`;
+      t+=`   Theme  : ${a.theme}\n   Date   : ${a.date||"Recent"}\n   Source : ${a.source}\n`;
+      if(a.url)t+=`   URL    : ${a.url}\n`;
+      t+=`   ${a.summary}\n\n`;
+    });
+  }
+  dl(new Blob([t],{type:"text/plain"}),`rosea_briefing_${iso()}.txt`);
+}
+function exportCSV(){
+  const list=getList();if(!list.length)return;
+  const esc=v=>`"${(v||"").replace(/"/g,'""')}"`;
+  const rows=list.map(a=>[a.country,a.theme,a.severity,a.date,a.title,a.source,a.summary,a.url].map(esc).join(",")).join("\n");
+  dl(new Blob(["Country,Theme,Severity,Date,Title,Source,Summary,URL\n"+rows],{type:"text/csv"}),`rosea_scan_${iso()}.csv`);
+}
+function exportWord(){
+  const list=getList();if(!list.length)return;
+  const today=new Date().toLocaleDateString("en-GB",{day:"2-digit",month:"long",year:"numeric"});
+  const byC={};list.forEach(a=>(byC[a.country]=byC[a.country]||[]).push(a));
+  const sCol={critical:"#C0392B",high:"#D35400",medium:"#1A6FA0",monitor:"#6B7280"};
+  const sLbl={critical:"CRITICAL",high:"HIGH",medium:"MEDIUM",monitor:"MONITOR"};
+
+  let rows="";
+  for(const [country,items] of Object.entries(byC).sort()){
+    rows+=`
+    <h2 style="color:#185FA5;font-size:13pt;font-family:Calibri,sans-serif;margin-top:14pt;margin-bottom:0;
+               padding-bottom:3pt;border-bottom:1.5pt solid #185FA5;">${country}</h2>`;
+    items.forEach(a=>{
+      const sc2=sCol[a.severity]||"#6B7280";
+      const sl=sLbl[a.severity]||"MONITOR";
+      const titleHtml=a.url
+        ?`<a href="${a.url}" style="color:#1a1a18;text-decoration:none;">${a.title.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")}</a>`
+        :a.title.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+      const urlHtml=a.url
+        ?`&nbsp;&nbsp;|&nbsp;&nbsp;<a href="${a.url}" style="color:#185FA5;font-size:8pt;">${a.url}</a>`
+        :"";
+      rows+=`
+    <p style="margin:7pt 0 1pt 0;font-family:Calibri,sans-serif;">
+      <span style="font-size:7pt;font-weight:bold;color:#fff;background:${sc2};
+                   padding:1pt 5pt;mso-highlight:${sc2};">${sl}</span>
+      &nbsp;&nbsp;<b style="font-size:11pt;">${titleHtml}</b>
+    </p>
+    <p style="margin:0 0 2pt 14pt;font-size:9.5pt;color:#333;font-family:Calibri,sans-serif;">
+      ${(a.summary||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")}
+    </p>
+    <p style="margin:0 0 8pt 14pt;font-size:8.5pt;color:#888;font-family:Calibri,sans-serif;">
+      <i>${a.theme}</i>&nbsp;&nbsp;|&nbsp;&nbsp;${a.date||"Recent"}&nbsp;&nbsp;|&nbsp;&nbsp;${a.source}${urlHtml}
+    </p>`;
+    });
+  }
+
+  const html=`<html xmlns:o="urn:schemas-microsoft-com:office:office"
+  xmlns:w="urn:schemas-microsoft-com:office:word"
+  xmlns="http://www.w3.org/TR/REC-html40">
+<head>
+<meta charset="UTF-8">
+<title>ROSEA Monitor Report</title>
+<!--[if gte mso 9]><xml>
+  <w:WordDocument>
+    <w:View>Print</w:View><w:Zoom>90</w:Zoom>
+    <w:DoNotOptimizeForBrowser/>
+  </w:WordDocument>
+</xml><![endif]-->
+<style>
+  body{font-family:Calibri,sans-serif;font-size:11pt;color:#1a1a18;margin:2.2cm 2.8cm;}
+  h1,h2{font-family:Calibri,sans-serif;}
+  a{color:#185FA5;}
+  p{line-height:1.45;}
+</style>
+</head>
+<body>
+<h1 style="color:#185FA5;font-size:17pt;border-bottom:2pt solid #185FA5;
+           padding-bottom:5pt;margin-bottom:3pt;">
+  OCHA ROSEA Humanitarian Monitor
+</h1>
+<p style="color:#666;font-size:9pt;margin:0 0 10pt 0;">
+  Generated: ${today}&nbsp;&nbsp;|&nbsp;&nbsp;
+  User: ${currentUser?currentUser.name:"ROSEA IM Unit"}&nbsp;&nbsp;|&nbsp;&nbsp;
+  Total alerts: ${list.length}&nbsp;&nbsp;|&nbsp;&nbsp;
+  Countries covered: ${Object.keys(byC).length}
+</p>
+${rows}
+<p style="margin-top:22pt;font-size:8pt;color:#aaa;border-top:1pt solid #ddd;padding-top:5pt;">
+  OCHA ROSEA Information Management Unit &mdash; Automated Media Monitoring Tool
+</p>
+</body>
+</html>`;
+
+  dl(new Blob(["﻿"+html],{type:"application/msword;charset=utf-8"}),`ROSEA_Report_${iso()}.doc`);
+}
+// ═══════════════════════════════════════════════════════════════
+//  AI ANALYSIS — OpenAI GPT-4o mini integration
+// ═══════════════════════════════════════════════════════════════
+
+let lastAIReport="";  // stores the raw AI text for export
+
+async function callOpenAI(messages){
+  const key=document.getElementById("aiKey").value.trim();
+  if(!key)return null;
+  try{
+    const r=await fetch("https://api.openai.com/v1/chat/completions",{
+      method:"POST",
+      headers:{"Content-Type":"application/json","Authorization":`Bearer ${key}`},
+      body:JSON.stringify({
+        model:"gpt-4o-mini",
+        messages,
+        max_tokens:1800,
+        temperature:0.25
+      })
+    });
+    const d=await r.json();
+    if(d.error)throw new Error(d.error.message);
+    return d.choices[0].message.content;
+  }catch(e){
+    showErr("OpenAI error: "+e.message);
+    return null;
+  }
+}
+
+async function runAIAnalysis(){
+  const list=allAlerts.slice(0,80);
+  if(!list.length){showErr("Run a scan first before analyzing with AI.");return;}
+  const key=document.getElementById("aiKey").value.trim();
+  if(!key){showErr("Enter an OpenAI API key in the sidebar.");return;}
+
+  const btn=document.getElementById("aiAnalyzeBtn");
+  btn.disabled=true;
+  btn.textContent="⏳ Analyzing…";
+  document.getElementById("aiPanel").style.display="block";
+  document.getElementById("aiPanelBody").innerHTML=`<p style="color:var(--text3);font-style:italic;">GPT-4o mini is reading ${list.length} articles and writing the situation report…</p>`;
+
+  // Build article list for the prompt
+  const articleText=list.map((a,i)=>
+    `[${i+1}] ${a.country} | ${a.date||"recent"} | ${a.theme} | ${a.severity.toUpperCase()}\n    ${a.title}\n    ${(a.summary||"").slice(0,220)}`
+  ).join("\n\n");
+
+  const todayStr=new Date().toLocaleDateString("en-GB",{weekday:"long",year:"numeric",month:"long",day:"numeric"});
+
+  const prompt=`You are an Information Management Officer for OCHA ROSEA (Eastern and Southern Africa). Today is ${todayStr}.
+
+The ROSEA media monitoring system has collected the following ${list.length} articles from ReliefWeb, GDACS, UN News, WHO, FEWS NET, AllAfrica, and Google News across 25 ROSEA countries.
+
+--- ARTICLES ---
+${articleText}
+--- END ---
+
+Write a professional humanitarian situation report in the following EXACT format (use the exact section headers):
+
+## SITUATION OVERVIEW
+Write 2–3 paragraphs summarising the overall humanitarian situation across the ROSEA region. Identify the most affected countries and key crisis drivers.
+
+## TOP CRITICAL DEVELOPMENTS
+List the 5 most urgent and critical developments. One bullet point each. Format: **[COUNTRY] — [development in one sentence]**
+
+## THEMATIC ANALYSIS
+Brief 1–2 sentence summary for each active humanitarian theme: Conflict & Security, Displacement, Food Security, Health, Climate & Disasters. Skip themes with no significant activity.
+
+## COUNTRIES REQUIRING IMMEDIATE ATTENTION
+List 3–5 countries that need priority monitoring this week, with one-sentence rationale for each.
+
+## MONITORING GAPS
+1–2 sentences on what information is missing or unclear from the current monitoring cycle.
+
+Be concise, factual, and professional. Use humanitarian sector language.`;
+
+  const result=await callOpenAI([
+    {role:"system",content:"You are a professional OCHA Information Management Officer. Write accurate, concise humanitarian situation reports. Never invent facts not present in the provided articles."},
+    {role:"user",content:prompt}
+  ]);
+
+  btn.disabled=false;
+  btn.textContent="✨ Analyze with GPT-4o mini";
+
+  if(result){
+    lastAIReport=result;
+    // Render markdown-lite to HTML
+    const html=result
+      .replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")
+      .replace(/^## (.+)$/gm,"<h3>$1</h3>")
+      .replace(/\*\*(.+?)\*\*/g,"<b>$1</b>")
+      .replace(/^[\*\-] (.+)$/gm,"<li>$1</li>")
+      .replace(/(<li>.*<\/li>)/gs,m=>`<ul>${m}</ul>`)
+      .replace(/\n\n/g,"</p><p>")
+      .replace(/\n/g,"<br>");
+    document.getElementById("aiPanelBody").innerHTML=`<p>${html}</p>`;
+  } else {
+    document.getElementById("aiPanelBody").innerHTML=`<p style="color:var(--red-text)">Analysis failed. Check your API key and try again.</p>`;
+  }
+}
+
+// ── Also auto-analyze if checkbox is ticked (called from runScan) ──
+function maybeAutoAnalyze(){
+  if(document.getElementById("autoAnalyze").checked&&
+     document.getElementById("aiKey").value.trim()&&
+     allAlerts.length){
+    setTimeout(runAIAnalysis,500);
+  }
+}
+
+// ── Export the AI report as a Word document ────────────────────
+function exportAIWord(){
+  if(!lastAIReport){showErr("Run AI Analysis first.");return;}
+  const today=new Date().toLocaleDateString("en-GB",{day:"2-digit",month:"long",year:"numeric"});
+  // Convert markdown-lite to Word-friendly HTML
+  const body=lastAIReport
+    .replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")
+    .replace(/^## (.+)$/gm,`<h2 style="color:#185FA5;font-size:12pt;font-family:Calibri,sans-serif;margin-top:14pt;border-bottom:1pt solid #ccc;padding-bottom:3pt;">$1</h2>`)
+    .replace(/\*\*(.+?)\*\*/g,"<b>$1</b>")
+    .replace(/^[\*\-] (.+)$/gm,"<li>$1</li>")
+    .replace(/(<li>.*<\/li>)/gs,m=>`<ul style="margin:4pt 0;">${m}</ul>`)
+    .replace(/\n\n/g,"</p><p style='margin:6pt 0;font-size:11pt;font-family:Calibri,sans-serif;'>")
+    .replace(/\n/g,"<br>");
+  const html=`<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word"><head><meta charset="UTF-8"><title>ROSEA SITREP</title><!--[if gte mso 9]><xml><w:WordDocument><w:View>Print</w:View></w:WordDocument></xml><![endif]--><style>body{font-family:Calibri,sans-serif;font-size:11pt;margin:2cm 2.8cm;}h1,h2{font-family:Calibri,sans-serif;}a{color:#185FA5;}</style></head><body>
+<h1 style="color:#185FA5;font-size:17pt;border-bottom:2pt solid #185FA5;padding-bottom:5pt;margin-bottom:3pt;">OCHA ROSEA — Humanitarian Situation Report</h1>
+<p style="color:#666;font-size:9pt;margin:0 0 10pt;">Generated: ${today} &nbsp;|&nbsp; User: ${currentUser?currentUser.name:"ROSEA IM Unit"} &nbsp;|&nbsp; AI-assisted: GPT-4o mini</p>
+<p style="font-size:11pt;font-family:Calibri,sans-serif;">${body}</p>
+<p style="margin-top:20pt;font-size:8pt;color:#aaa;border-top:1pt solid #ddd;padding-top:5pt;">OCHA ROSEA Information Management Unit &mdash; AI-assisted analysis via OpenAI GPT-4o mini. Content is based on collected media reports and should be verified before official use.</p>
+</body></html>`;
+  dl(new Blob(["﻿"+html],{type:"application/msword;charset=utf-8"}),`ROSEA_SITREP_AI_${iso()}.doc`);
+}
+
+function iso(){return new Date().toISOString().slice(0,10);}
+function dl(blob,name){const u=URL.createObjectURL(blob);const a=document.createElement("a");a.href=u;a.download=name;a.click();URL.revokeObjectURL(u);}
+</script>
+</body>
+</html>
