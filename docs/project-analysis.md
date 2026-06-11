@@ -4,7 +4,7 @@
 
 `ROSEA-Media` is a static, browser-only humanitarian monitoring tool for OCHA ROSEA workflows. It scans public sources across 25 countries, classifies items by country, theme, and severity, and lets analysts export or summarize the results.
 
-The current implementation is useful as a lightweight prototype, but it is not a secure internal system. Login is client-side only, OpenAI is called from the browser, and source fetching depends on third-party CORS proxies.
+The current implementation is useful as a lightweight working build, but it is not a secure internal system. Login is client-side only, OpenAI is called from the browser, and source fetching depends on third-party CORS proxies.
 
 ## What it does
 
@@ -23,16 +23,17 @@ This is a monitoring and briefing tool, not a database-backed application.
 ## Current architecture
 
 - `index.html` contains the full app: HTML, CSS, and JavaScript.
-- `.github/workflows/static.yml` deploys the site to GitHub Pages.
+- `.github/workflows/static.yml` deploys the site through the current static hosting pipeline.
 - There is no backend, database, build step, or test suite.
 
 Runtime shape:
 
-- static delivery through GitHub Pages
+- static delivery through the current hosting setup
 - client-side auth using a hardcoded `USERS` array
 - in-memory alert list in `allAlerts`
 - browser-side exports
-- optional browser-side OpenAI call
+- browser-side OpenAI call
+- ad hoc browser-side source pipeline with proxy racing and limited failure visibility
 
 ## Data sources
 
@@ -62,6 +63,7 @@ Local hardcoded data:
 - Classification is heuristic through functions such as `matchCountry(...)`, `detectTheme(...)`, and `scoreSeverity(...)`.
 - Duplicate reduction happens after cross-source aggregation.
 - Google News supports `quick`, `standard`, and `full` scan modes.
+- Source collection is effectively a lightweight pipeline, but retry, cache, append, and monitoring behavior are not yet formalized as modules.
 
 ## Main risks
 
@@ -77,6 +79,8 @@ Reliability:
 - source formats may change
 - proxy availability is outside project control
 - Google News results are variable
+- partial source failures are not surfaced clearly enough for operators
+- scan reliability depends on inline logic rather than a defined pipeline layer
 
 Maintainability:
 
@@ -86,7 +90,7 @@ Maintainability:
 
 ## Assessment
 
-This is a credible internal prototype with low hosting cost and clear analyst value. It is not yet suitable as a secure shared application.
+This is a credible internal working build with low hosting cost and clear analyst value. It is not yet suitable as a secure shared application.
 
 The practical next steps are:
 
@@ -94,5 +98,6 @@ The practical next steps are:
 2. replace browser-only auth
 3. move stable config out of inline JavaScript
 4. split the monolithic file into modules
+5. formalize the scan pipeline with retry, cache, append, and degraded-source monitoring
 
 Until then, it should be treated as a convenience dashboard rather than a trusted internal platform.
