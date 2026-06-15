@@ -1,6 +1,7 @@
 // Vercel serverless proxy — fetches RSS/XML feeds server-side and relays to the browser.
 // Solves the CORS problem: browser can't fetch news sites directly, but this function can.
-export default async function handler(req, res) {
+// Uses CommonJS (module.exports) to avoid ESM conflict from "type":"module" in package.json.
+module.exports = async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
 
@@ -35,4 +36,4 @@ export default async function handler(req, res) {
   } catch (e) {
     res.status(502).send('Upstream error: ' + e.message);
   }
-}
+};
