@@ -313,7 +313,7 @@ input[type=checkbox]{accent-color:var(--blue);width:14px;height:14px;cursor:poin
     <hr>
     <div class="slabel" style="margin-bottom:6px">Media sources</div>
     <div class="toggle-row">
-      <input type="checkbox" id="useCountryMedia" onchange="renderSiteTags()"/>
+      <input type="checkbox" id="useCountryMedia" checked onchange="renderSiteTags()"/>
       <label for="useCountryMedia">Auto-include country-specific outlets from the ROSEA sweep list</label>
     </div>
     <div class="add-row">
@@ -523,34 +523,51 @@ const COUNTRY_KW={
   zimbabwe:["humanitarian crisis","floods","drought","refugees","food insecurity","cholera","measles","malnutrition","cyclone","disease outbreak","emergency response","heavy rainfall","protection","aid response"]
 };
 
-// Country-specific media outlets from the ROSEA sweep list
+// Country-specific media outlets — built from ROSEA_Media_Sources.xlsx
 const COUNTRY_MEDIA={
-  angola:["jornaldeangola.ao","angolatelegraph.com","angop.ao"],
-  botswana:["dailynews.gov.bw","thegazette.news"],
-  burundi:["abpinfo.bi","iwacu-burundi.org","burundi-agnews.org"],
-  comoros:["habariazacomores.com"],djibouti:["adi.dj"],eritrea:["shabait.com"],
-  ethiopia:["ena.et","addisstandard.com","borkena.com","waltainfo.com"],
-  kenya:["citizen.digital","capitalfm.co.ke","nation.africa","standardmedia.co.ke","the-star.co.ke"],
-  lesotho:["lesothotribune.co.ls"],
-  madagascar:["midi-madagasikara.mg","lagazette-dgi.com","lexpress.mg"],
-  malawi:["malawivoice.com","malawi24.com","nyasatimes.com","times.mw"],
-  mauritius:["lexpress.mu"],mozambique:["carta.co.mz","clubofmozambique.com"],
-  namibia:["namibian.com.na","nampa.org","neweralive.na"],
-  rwanda:["ktpress.rw","newtimes.co.rw"],
+  angola:["jornaldeangola.ao","angolatelegraph.com","angop.ao","club-k.net","portaldeangola.com"],
+  botswana:["dailynews.gov.bw","thegazette.news","guardiansun.co.bw","mmegi.bw","weekendpost.co.bw","sundaystandard.info"],
+  burundi:["abpinfo.bi","iwacu-burundi.org","netpress.bi","burundi-agnews.org","sosmediasburundi.org"],
+  comoros:["habarizacomores.com","comoresinfos.net"],
+  djibouti:["adi.dj"],
+  drc:["actualite.cd","acpcongo.com","mediacongo.net","radiookapi.net"],
+  eritrea:["shabait.com","awate.com","asenatv.com","asmarino.com"],
+  eswatini:["observer.org.sz","times.co.sz"],
+  ethiopia:["ena.et","addisstandard.com","borkena.com","fanabc.com","waltainfo.com","zehabesha.com"],
+  kenya:["citizen.digital","capitalfm.co.ke","kenyanews.go.ke","nation.africa","standardmedia.co.ke","the-star.co.ke"],
+  lesotho:["lesothotribune.co.ls","thepost.co.ls"],
+  madagascar:["midi-madagasikara.mg","lagazette-dgi.com","laverite.mg","lexpress.mg","madagascar-tribune.com","malagasynews.com"],
+  malawi:["malawivoice.com","malawi24.com","nyasatimes.com","times.mw","maravipost.com"],
+  mauritius:["lexpress.mu","inside.news"],
+  mozambique:["cartamz.com","aimnews.org","clubofmozambique.com","jornalnoticias.co.mz"],
+  namibia:["namibian.com.na","nampa.org","neweralive.na","nbcnews.na"],
+  rwanda:["ktpress.rw","newtimes.co.rw","taarifa.rw","rwandatoday.africa"],
   seychelles:["nation.sc","seychellesnewsagency.com"],
-  somalia:["garoweonline.com","shabelle.net","hiiraan.com"],
-  south_africa:["dailymaverick.co.za","ewn.co.za","mg.co.za","news24.com"],
+  somalia:["sonna.so","garoweonline.com","somaliguardian.com","hiiraan.com","mustaqbalmedia.net","shabellemedia.com"],
+  south_africa:["dailymaverick.co.za","iol.co.za","ewn.co.za","mg.co.za","timeslive.co.za","news24.com","sabcnews.com"],
   south_sudan:["eyeradio.org","radiotamazuj.org"],
-  sudan:["dabangasudan.org","sudantribune.com"],
-  tanzania:["dailynews.co.tz","thecitizen.co.tz"],
-  uganda:["monitor.co.ug","independent.co.ug","newvision.co.ug"],
-  zambia:["lusakatimes.com","times.co.zm","daily-mail.co.zm"],
-  zimbabwe:["herald.co.zw","newsday.co.zw","newzimbabwe.com","theindependent.co.zw"]
+  sudan:["darfur24.com","dabangasudan.org","suna-sd.net","sudantribune.com","sudanspost.com"],
+  tanzania:["dailynews.co.tz","thecitizen.co.tz","ippmedia.com","mwananchi.co.tz"],
+  uganda:["monitor.co.ug","independent.co.ug","nbs.ug","observer.ug","nilepost.co.ug","ugandaradionetwork.net","newvision.co.ug","ugandatimes.ug"],
+  zambia:["diggers.news","lusakatimes.com","mwebantu.com","times.co.zm","daily-mail.co.zm","zambianeye.com"],
+  zimbabwe:["bulawayo24.com","cite.org.zw","newzimbabwe.com","herald.co.zw","theindependent.co.zw","newsday.co.zw","zimlive.com"]
 };
+// Regional outlets checked on every scan regardless of country selection
+const REGIONAL_MEDIA=["thenewhumanitarian.org","theafricareport.com","allafrica.com","africanews.com","rfi.fr","france24.com","voanews.com"];
+
+// Known aggregator/scraper domains that republish content — filter these from results
+const BLOCKED_DOMAINS=new Set([
+  "newsnow.co.uk","newsnow.com","msn.com","news.google.com","flipboard.com",
+  "smartnews.com","feedly.com","inoreader.com","feedspot.com",
+  "africafeeds.com","medafricatimes.com","panapress.com","cajnewsafrica.com",
+  "devdiscourse.com","ibtimes.com","thezimbabwemail.com","masvingomirror.com",
+  "newsdzezimbabwe.co.uk","zimbabwesituation.com",
+  "tanzania-web.com","tanzaniaweb.com","rwanda.direct.news","madagascar.direct.news"
+]);
 
 let sc=new Set(COUNTRIES.map(x=>x[0]));
 let st=new Set(THEMES.map(x=>x[0]));
-let allAlerts=[];let activeTab="all";let activeCountry="all";
+let allAlerts=[];let allAlertsExport=[];let activeTab="all";let activeCountry="all";
 let customKeywords=[];let customSites=[];
 let collapsed={horn:false,greatlakes:false,southern:false};
 
@@ -639,7 +656,7 @@ function clrRes(){
   document.getElementById("srcTabs").style.display="none";
   document.getElementById("countryFilterRow").style.display="none";
   document.getElementById("infoBox").style.display="block";
-  allAlerts=[];activeTab="all";activeCountry="all";
+  allAlerts=[];allAlertsExport=[];activeTab="all";activeCountry="all";
 }
 
 // ─── HELPERS ──────────────────────────────────────────────────
@@ -668,11 +685,41 @@ function filterByTheme(alerts){
   const active=new Set([...st].map(id=>themeMap[id]));
   return alerts.filter(a=>active.has(a.theme)||a.theme==="General");
 }
+// Master list of humanitarian keywords — article must have at least one in title+summary
+const HUM_KEYWORDS=["humanitarian","conflict","violence","armed","clashes","attack","militia","rebel","war","airstrike","atrocity","refugee","displacement","idp","displaced","flee","asylum","camp","returnee","food insecurity","famine","hunger","malnutrition","ipc","starvation","crop failure","cholera","outbreak","epidemic","measles","mpox","malaria","ebola","polio","vaccination","disease","flood","cyclone","drought","earthquake","landslide","storm","disaster","emergency","crisis","casualties","deaths","killed","injured","evacuated","ceasefire","coup","protest","unrest","sanctions","relief","aid","humanitarian response","protection","insecurity","acute","wfp","unhcr","unicef","ocha","icrc","msf","save the children"];
+
+function requiresKeyword(a){
+  const txt=(a.title+" "+a.summary).toLowerCase();
+  return HUM_KEYWORDS.some(k=>txt.includes(k))||customKeywords.some(k=>txt.includes(k.toLowerCase()));
+}
+
 function dedup(alerts){
-  const seen=new Set();
+  const seenTitle=new Set();
+  const seenUrl=new Set();
   return alerts.filter(a=>{
-    const k=a.title.slice(0,65).toLowerCase().replace(/\s+/g," ");
-    if(seen.has(k))return false;seen.add(k);return true;
+    const tk=a.title.slice(0,70).toLowerCase().replace(/\s+/g," ");
+    let domain="";
+    try{domain=new URL(a.url).hostname.replace(/^www\./,"");}catch(e){}
+    // Block known aggregator domains
+    if(domain&&BLOCKED_DOMAINS.has(domain))return false;
+    // Title dedup
+    if(seenTitle.has(tk))return false;
+    seenTitle.add(tk);
+    // URL+short-title dedup (catches same story republished under same domain)
+    const uk=domain+"::"+a.title.slice(0,40).toLowerCase().replace(/\s+/g,"");
+    if(seenUrl.has(uk))return false;
+    seenUrl.add(uk);
+    return true;
+  });
+}
+
+// Limit articles per country+theme to prevent one topic dominating
+function capByTopic(alerts,cap=6){
+  const counts={};
+  return alerts.filter(a=>{
+    const k=`${a.country}||${a.theme}`;
+    counts[k]=(counts[k]||0)+1;
+    return counts[k]<=cap;
   });
 }
 function matchCountry(combined){
@@ -969,6 +1016,13 @@ async function fetchGoogleNews(countries,days){
     }
   }
 
+  // Regional media — always searched when country media is enabled
+  if(useMedia){
+    for(const site of REGIONAL_MEDIA){
+      queries.push({q:`site:${site} (${MASTER_KW})`,country:"ROSEA region"});
+    }
+  }
+
   // Custom sites (always, all modes)
   if(customSites.length>0){
     for(const site of customSites){
@@ -1072,22 +1126,28 @@ async function runScan(){
     }
 
     setStatus("Deduplicating and ranking results…");
-    let alerts=dedup(filterByTheme(combined));
+    // 1. Filter to selected themes, 2. Dedup, 3. Tag each article as Humanitarian or Non-Humanitarian,
+    //    4. Split: humanitarian goes to display, both go to export
+    const deduplicated=dedup(filterByTheme(combined));
+    deduplicated.forEach(a=>{a.category=requiresKeyword(a)?"Humanitarian":"Non-Humanitarian";});
+    let alerts=capByTopic(deduplicated.filter(a=>a.category==="Humanitarian"));
+    const nonHumAlerts=capByTopic(deduplicated.filter(a=>a.category==="Non-Humanitarian"),3);
     const ord={critical:0,high:1,medium:2,monitor:3};
-    // Sort: humanitarian themes first → by severity → newest date first
-    alerts.sort((a,b)=>{
+    const sortFn=(a,b)=>{
       const ha=a.theme==="General"?1:0, hb=b.theme==="General"?1:0;
       if(ha!==hb)return ha-hb;
       const s=(ord[a.severity]??3)-(ord[b.severity]??3);
       if(s)return s;
       return new Date(b.date||0)-new Date(a.date||0);
-    });
+    };
+    alerts.sort(sortFn);
+    nonHumAlerts.sort(sortFn);
     setP(100);setStatus(false);
 
     if(!alerts.length){
       document.getElementById("results").innerHTML=`<div class="empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:42px;height:42px;margin:0 auto 12px;opacity:.22;display:block"><circle cx="12" cy="12" r="2"/><path d="M16.24 7.76a6 6 0 0 1 0 8.49M7.76 16.24a6 6 0 0 1 0-8.49M20.07 4.93a10 10 0 0 1 0 14.14M3.93 19.07a10 10 0 0 1 0-14.14"/></svg><p>No alerts found. Try a longer time window or more countries.</p></div>`;
     } else {
-      allAlerts=alerts;activeTab="all";activeCountry="all";
+      allAlerts=alerts;allAlertsExport=[...alerts,...nonHumAlerts];activeTab="all";activeCountry="all";
       buildSourceTabs(alerts);buildCountryDropdown(alerts);
       renderAlerts(alerts,false);
       maybeAutoAnalyze();
@@ -1230,49 +1290,55 @@ function getList(){
   return activeCountry==="all"?base:base.filter(a=>a.country===activeCountry);
 }
 function exportTxt(){
-  const list=getList();if(!list.length)return;
+  const full=allAlertsExport.length?allAlertsExport:getList();if(!full.length)return;
   const d=new Date().toLocaleDateString("en-GB",{day:"2-digit",month:"short",year:"numeric"});
-  let t=`ROSEA HUMANITARIAN MONITOR — SITUATION BRIEFING\nGenerated: ${d}  |  User: ${currentUser?.name||""}\n${"=".repeat(60)}\n`;
-  const byC={};list.forEach(a=>(byC[a.country]=byC[a.country]||[]).push(a));
-  for(const [country,items] of Object.entries(byC).sort()){
-    t+=`\n── ${country} ${"─".repeat(Math.max(0,52-country.length))}\n`;
-    items.forEach((a,i)=>{
-      t+=`${i+1}. [${(a.severity||"MONITOR").toUpperCase()}] ${a.title}\n`;
-      t+=`   Theme  : ${a.theme}\n   Date   : ${a.date||"Recent"}\n   Source : ${a.source}\n`;
-      if(a.url)t+=`   URL    : ${a.url}\n`;
-      t+=`   ${a.summary}\n\n`;
-    });
-  }
+  const humList=full.filter(a=>a.category!=="Non-Humanitarian");
+  const nonHumList=full.filter(a=>a.category==="Non-Humanitarian");
+  const section=(items,label)=>{
+    let t=`\n${"═".repeat(60)}\n${label} (${items.length})\n${"═".repeat(60)}\n`;
+    const byC={};items.forEach(a=>(byC[a.country]=byC[a.country]||[]).push(a));
+    for(const [country,arts] of Object.entries(byC).sort()){
+      t+=`\n── ${country} ${"─".repeat(Math.max(0,52-country.length))}\n`;
+      arts.forEach((a,i)=>{
+        t+=`${i+1}. [${(a.severity||"MONITOR").toUpperCase()}] ${a.title}\n`;
+        t+=`   Theme  : ${a.theme}\n   Date   : ${a.date||"Recent"}\n   Source : ${a.source}\n`;
+        if(a.url)t+=`   URL    : ${a.url}\n`;
+        t+=`   ${a.summary}\n\n`;
+      });
+    }
+    return t;
+  };
+  let t=`ROSEA HUMANITARIAN MONITOR — SITUATION BRIEFING\nGenerated: ${d}  |  User: ${currentUser?.name||""}\n`;
+  t+=section(humList,"HUMANITARIAN ALERTS");
+  if(nonHumList.length)t+=section(nonHumList,"NON-HUMANITARIAN / CONTEXT ARTICLES");
   dl(new Blob([t],{type:"text/plain"}),`rosea_briefing_${iso()}.txt`);
 }
 function exportCSV(){
-  const list=getList();if(!list.length)return;
+  const list=allAlertsExport.length?allAlertsExport:getList();if(!list.length)return;
   const esc=v=>`"${(v||"").replace(/"/g,'""')}"`;
-  const rows=list.map(a=>[a.country,a.theme,a.severity,a.date,a.title,a.source,a.summary,a.url].map(esc).join(",")).join("\n");
-  dl(new Blob(["Country,Theme,Severity,Date,Title,Source,Summary,URL\n"+rows],{type:"text/csv"}),`rosea_scan_${iso()}.csv`);
+  const rows=list.map(a=>[
+    a.category||"Humanitarian",a.country,a.theme,a.severity,a.date,a.title,a.source,a.summary,a.url
+  ].map(esc).join(",")).join("\n");
+  dl(new Blob(["Category,Country,Theme,Severity,Date,Title,Source,Summary,URL\n"+rows],{type:"text/csv"}),`rosea_scan_${iso()}.csv`);
 }
 function exportWord(){
-  const list=getList();if(!list.length)return;
+  const full=allAlertsExport.length?allAlertsExport:getList();if(!full.length)return;
   const today=new Date().toLocaleDateString("en-GB",{day:"2-digit",month:"long",year:"numeric"});
-  const byC={};list.forEach(a=>(byC[a.country]=byC[a.country]||[]).push(a));
+  const humList=full.filter(a=>a.category!=="Non-Humanitarian");
+  const nonHumList=full.filter(a=>a.category==="Non-Humanitarian");
   const sCol={critical:"#C0392B",high:"#D35400",medium:"#1A6FA0",monitor:"#6B7280"};
   const sLbl={critical:"CRITICAL",high:"HIGH",medium:"MEDIUM",monitor:"MONITOR"};
 
-  let rows="";
-  for(const [country,items] of Object.entries(byC).sort()){
-    rows+=`
-    <h2 style="color:#185FA5;font-size:13pt;font-family:Calibri,sans-serif;margin-top:14pt;margin-bottom:0;
-               padding-bottom:3pt;border-bottom:1.5pt solid #185FA5;">${country}</h2>`;
-    items.forEach(a=>{
-      const sc2=sCol[a.severity]||"#6B7280";
-      const sl=sLbl[a.severity]||"MONITOR";
-      const titleHtml=a.url
-        ?`<a href="${a.url}" style="color:#1a1a18;text-decoration:none;">${a.title.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")}</a>`
-        :a.title.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
-      const urlHtml=a.url
-        ?`&nbsp;&nbsp;|&nbsp;&nbsp;<a href="${a.url}" style="color:#185FA5;font-size:8pt;">${a.url}</a>`
-        :"";
-      rows+=`
+  const buildArticleHtml=a=>{
+    const sc2=sCol[a.severity]||"#6B7280";
+    const sl=sLbl[a.severity]||"MONITOR";
+    const titleHtml=a.url
+      ?`<a href="${a.url}" style="color:#1a1a18;text-decoration:none;">${a.title.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")}</a>`
+      :a.title.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+    const urlHtml=a.url
+      ?`&nbsp;&nbsp;|&nbsp;&nbsp;<a href="${a.url}" style="color:#185FA5;font-size:8pt;">${a.url}</a>`
+      :"";
+    return `
     <p style="margin:7pt 0 1pt 0;font-family:Calibri,sans-serif;">
       <span style="font-size:7pt;font-weight:bold;color:#fff;background:${sc2};
                    padding:1pt 5pt;mso-highlight:${sc2};">${sl}</span>
@@ -1284,9 +1350,26 @@ function exportWord(){
     <p style="margin:0 0 8pt 14pt;font-size:8.5pt;color:#888;font-family:Calibri,sans-serif;">
       <i>${a.theme}</i>&nbsp;&nbsp;|&nbsp;&nbsp;${a.date||"Recent"}&nbsp;&nbsp;|&nbsp;&nbsp;${a.source}${urlHtml}
     </p>`;
-    });
-  }
+  };
 
+  const buildSectionHtml=(items,label,borderColor)=>{
+    if(!items.length)return "";
+    let html=`
+    <h1 style="color:${borderColor};font-size:14pt;font-family:Calibri,sans-serif;
+               border-bottom:2pt solid ${borderColor};padding-bottom:4pt;margin-top:20pt;">
+      ${label} (${items.length})
+    </h1>`;
+    const byC={};items.forEach(a=>(byC[a.country]=byC[a.country]||[]).push(a));
+    for(const [country,arts] of Object.entries(byC).sort()){
+      html+=`
+    <h2 style="color:${borderColor};font-size:12pt;font-family:Calibri,sans-serif;margin-top:12pt;margin-bottom:0;
+               padding-bottom:3pt;border-bottom:1pt solid ${borderColor};">${country}</h2>`;
+      arts.forEach(a=>{html+=buildArticleHtml(a);});
+    }
+    return html;
+  };
+
+  const allCountries=new Set(full.map(a=>a.country));
   const html=`<html xmlns:o="urn:schemas-microsoft-com:office:office"
   xmlns:w="urn:schemas-microsoft-com:office:word"
   xmlns="http://www.w3.org/TR/REC-html40">
@@ -1314,10 +1397,12 @@ function exportWord(){
 <p style="color:#666;font-size:9pt;margin:0 0 10pt 0;">
   Generated: ${today}&nbsp;&nbsp;|&nbsp;&nbsp;
   User: ${currentUser?currentUser.name:"ROSEA IM Unit"}&nbsp;&nbsp;|&nbsp;&nbsp;
-  Total alerts: ${list.length}&nbsp;&nbsp;|&nbsp;&nbsp;
-  Countries covered: ${Object.keys(byC).length}
+  Humanitarian alerts: ${humList.length}&nbsp;&nbsp;|&nbsp;&nbsp;
+  Context articles: ${nonHumList.length}&nbsp;&nbsp;|&nbsp;&nbsp;
+  Countries covered: ${allCountries.size}
 </p>
-${rows}
+${buildSectionHtml(humList,"HUMANITARIAN ALERTS","#185FA5")}
+${buildSectionHtml(nonHumList,"NON-HUMANITARIAN / CONTEXT ARTICLES","#6B7280")}
 <p style="margin-top:22pt;font-size:8pt;color:#aaa;border-top:1pt solid #ddd;padding-top:5pt;">
   OCHA ROSEA Information Management Unit &mdash; Automated Media Monitoring Tool
 </p>
